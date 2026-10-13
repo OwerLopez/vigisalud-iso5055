@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+*.db
+.vercel
+docs/slides_lote*.json
+docs/TP5_slides_min*
+web/index_doc.json
+docs/*.pptx
