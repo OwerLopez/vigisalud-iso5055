@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VigiSalud Quality Dashboard</title>
+<meta name="description" content="ISO/IEC 5055 code-quality and efficiency indicators of VigiSalud Arequipa, before and after an ISO/IEC 20246 code review.">
+<meta name="author" content="OwerLopez">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%237A1F2B'/%3E%3Cpath d='M9 17l4.5 4.5L23 11' stroke='white' stroke-width='3.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<style>
+/* Layout: fixed sidebar navigation + scrolling main column of panels; collapses to a top tab strip on phones. */
+:root {
+  color-scheme: light;
+  --bg: #F4F4F1; --surface: #FCFCFB; --surface-2: #F0EFEB; --line: #E4E2DC; --grid: #ECEBE6;
+  --text: #0B0B0B; --text-2: #52514E; --text-3: #7A7974;
+  --brand: #7A1F2B; --brand-soft: #F3E6E8;
+  --s-new: #2A78D6; --s-old: #EB6834;
+  --good: #0CA30C; --warn: #FAB219; --crit: #D03B3B; --na: #9A9993;
+  --shadow: 0 1px 2px rgba(16,16,14,.05), 0 8px 24px rgba(16,16,14,.05);
+  --pop: 0 10px 30px rgba(16,16,14,.16);
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --r: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111110; --surface: #1A1A19; --surface-2: #222220; --line: #2E2D2A; --grid: #262523;
+    --text: #FFFFFF; --text-2: #C3C2B7; --text-3: #8E8D86;
+    --brand: #E0788A; --brand-soft: #3A2226;
+    --s-new: #3987E5; --s-old: #D95926;
+    --shadow: none; --pop: 0 10px 30px rgba(0,0,0,.55);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111110; --surface: #1A1A19; --surface-2: #222220; --line: #2E2D2A; --grid: #262523;
+  --text: #FFFFFF; --text-2: #C3C2B7; --text-3: #8E8D86;
+  --brand: #E0788A; --brand-soft: #3A2226;
+  --s-new: #3987E5; --s-old: #D95926;
+  --shadow: none; --pop: 0 10px 30px rgba(0,0,0,.55);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--s-new); outline-offset: 2px; border-radius: 6px; }
+.num, td.n, .mono { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--mono); }
+
+/* ---------- shell */
+.shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100vh; }
+.side { position: sticky; top: 0; height: 100vh; padding: 22px 16px; border-right: 1px solid var(--line); background: var(--surface);
+        display: flex; flex-direction: column; gap: 22px; }
+.logo { display: flex; gap: 10px; align-items: center; text-decoration: none; padding: 0 6px; }
+.logo-mark { width: 30px; height: 30px; border-radius: 8px; background: var(--brand); display: grid; place-items: center; flex: none; }
+.logo-mark svg { width: 18px; height: 18px; }
+.logo b { display: block; font-size: 15px; letter-spacing: -.01em; }
+.logo small { display: block; color: var(--text-3); font-size: 12px; }
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: var(--text-2); font-weight: 500; font-size: 14px; }
+.nav a:hover { background: var(--surface-2); color: var(--text); }
+.nav a.on { background: var(--brand-soft); color: var(--brand); }
+.nav svg { width: 16px; height: 16px; flex: none; }
+.side-foot { margin-top: auto; font-size: 12px; color: var(--text-3); padding: 0 6px; display: flex; flex-direction: column; gap: 6px; }
+.side-foot a { color: var(--text-2); }
+
+main { min-width: 0; }
+.top { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: space-between;
+       padding: 12px clamp(16px, 3vw, 36px); background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px) saturate(1.3);
+       border-bottom: 1px solid var(--line); }
+.crumbs { font-size: 13px; color: var(--text-3); display: flex; gap: 8px; align-items: center; min-width: 0; }
+.crumbs b { color: var(--text); font-weight: 600; }
+.controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.seg { display: inline-flex; padding: 3px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--line); }
+.seg button { border: 0; background: transparent; padding: 5px 11px; border-radius: 7px; font-size: 13px; font-weight: 500; color: var(--text-2); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.iconbtn { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; width: 34px; height: 34px; display: grid; place-items: center; cursor: pointer; color: var(--text-2); text-decoration: none; }
+.iconbtn:hover { color: var(--text); }
+.iconbtn svg { width: 16px; height: 16px; }
+
+.content { padding: 28px clamp(16px, 3vw, 36px) 56px; display: flex; flex-direction: column; gap: 28px; max-width: 1320px; }
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px; align-items: end; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--brand); margin: 0 0 6px; }
+h1 { font-size: clamp(26px, 3.2vw, 36px); line-height: 1.12; letter-spacing: -.025em; margin: 0; font-weight: 700; text-wrap: balance; max-width: 26ch; }
+.lede { color: var(--text-2); margin: 10px 0 0; max-width: 72ch; }
+.verdict { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; box-shadow: var(--shadow); min-width: 260px; }
+.verdict small { color: var(--text-3); font-size: 12px; display: block; }
+.verdict .big { font-size: 30px; font-weight: 700; letter-spacing: -.02em; }
+.verdict .big span { color: var(--text-3); font-weight: 500; font-size: 18px; }
+
+section { display: flex; flex-direction: column; gap: 14px; }
+.sec-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; }
+h2 { font-size: 19px; margin: 0; letter-spacing: -.01em; font-weight: 650; }
+.sec-head p { margin: 2px 0 0; color: var(--text-2); font-size: 14px; max-width: 70ch; }
+.grid { display: grid; gap: 14px; }
+.g-kpi { grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); }
+.g-2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; box-shadow: var(--shadow); min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.card h3 { font-size: 15px; margin: 0; font-weight: 600; }
+.card .note { font-size: 13px; color: var(--text-3); margin: -6px 0 0; }
+
+/* ---------- KPI tiles */
+.kpi { gap: 6px; }
+.kpi .lab { font-size: 13px; color: var(--text-2); display: flex; justify-content: space-between; gap: 8px; align-items: start; }
+.kpi .code { font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+.kpi .val { font-size: 32px; font-weight: 700; letter-spacing: -.03em; line-height: 1.1; }
+.kpi .val small { font-size: 15px; color: var(--text-3); font-weight: 500; margin-left: 3px; }
+.kpi .foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-3); }
+.delta { font-weight: 600; font-size: 12.5px; padding: 1px 7px; border-radius: 999px; background: var(--surface-2); color: var(--text-2); }
+
+/* ---------- status badge (icon + label, never colour alone) */
+.badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 2px 8px 2px 6px; border-radius: 999px;
+         border: 1px solid var(--line); background: var(--surface); color: var(--text-2); white-space: nowrap; }
+.badge i { width: 14px; height: 14px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 10px; font-weight: 700; color: #fff; }
+.badge.good i { background: var(--good); } .badge.warning i { background: var(--warn); color: #3A2A00; }
+.badge.critical i { background: var(--crit); } .badge.na i { background: var(--na); }
+
+/* ---------- tables */
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.search { flex: 1 1 220px; max-width: 340px; border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 10px; padding: 7px 11px; font: inherit; font-size: 14px; }
+.tablewrap { overflow: auto; border: 1px solid var(--line); border-radius: 10px; max-height: 560px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { position: sticky; top: 0; background: var(--surface-2); text-align: left; font-size: 12px; font-weight: 600; color: var(--text-2); padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; z-index: 1; }
+th button { all: unset; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; }
+th button:focus-visible { outline: 2px solid var(--s-new); }
+td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+tr:last-child td { border-bottom: 0; }
+td.n, th.n { text-align: right; }
+td .sub { display: block; font-size: 12px; color: var(--text-3); }
+.pill { font-family: var(--mono); font-size: 11.5px; padding: 1px 6px; border-radius: 6px; background: var(--surface-2); color: var(--text-2); border: 1px solid var(--line); white-space: nowrap; }
+.arrow { color: var(--text-3); padding: 0 4px; }
+.count { font-size: 13px; color: var(--text-3); }
+
+/* ---------- charts */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--text-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { font-family: var(--sans); fill: var(--text-2); font-size: 12px; }
+.chart .val-l { fill: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--pop);
+       padding: 8px 10px; font-size: 12.5px; min-width: 150px; z-index: 5; opacity: 0; transition: opacity .12s; }
+.tip.on { opacity: 1; }
+.tip .t { color: var(--text-3); margin-bottom: 4px; font-size: 12px; }
+.tip .r { display: flex; justify-content: space-between; gap: 14px; align-items: center; }
+.tip .r b { font-variant-numeric: tabular-nums; }
+.tip .sw { width: 9px; height: 9px; border-radius: 2px; display: inline-block; margin-right: 6px; }
+.bignums { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 10px; }
+.bignum { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--surface-2); }
+.bignum b { font-size: 20px; letter-spacing: -.02em; display: block; font-variant-numeric: tabular-nums; }
+.bignum span { font-size: 12.5px; color: var(--text-3); }
+.callout { border-left: 3px solid var(--crit); background: var(--surface-2); border-radius: 8px; padding: 10px 12px; font-size: 13.5px; color: var(--text-2); }
+.callout b { color: var(--text); }
+.meth { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 14px; font-size: 14px; color: var(--text-2); }
+.meth h3 { color: var(--text); }
+.meth p { margin: 0; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 8px; counter-reset: s; }
+.step { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--surface); font-size: 13px; color: var(--text-2); }
+.step b { display: block; color: var(--text); font-size: 13.5px; margin-bottom: 2px; }
+.step em { font-style: normal; font-family: var(--mono); font-size: 11px; color: var(--brand); }
+footer.foot { border-top: 1px solid var(--line); padding-top: 18px; font-size: 12.5px; color: var(--text-3); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .card { animation: rise .4s ease-out both; }
+  @keyframes rise { from { transform: translateY(6px); } to { transform: none; } }
+}
+@media (max-width: 920px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .side { position: static; height: auto; flex-direction: row; align-items: center; gap: 12px; padding: 10px 16px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  .nav { flex-direction: row; }
+  .nav a span { white-space: nowrap; }
+  .side-foot, .logo div { display: none; }
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  html { scroll-padding-top: 20px; }
+  .top { position: static; }
+}
+@media (max-width: 560px) { .hide-sm { display: none; } }
+@media print { .side, .top { display: none; } .shell { display: block; } .card { break-inside: avoid; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side" aria-label="Navigation">
+    <a class="logo" href="#overview" aria-label="VigiSalud">
+      <span class="logo-mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"/></svg></span>
+      <div><b>VigiSalud</b><small data-i18n="brandSub"></small></div>
+    </a>
+    <nav class="nav" id="nav">
+      <a href="#overview" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span data-i18n="navOverview"></span></a>
+      <a href="#scorecard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span data-i18n="navScore"></span></a>
+      <a href="#weaknesses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg><span data-i18n="navWeak"></span></a>
+      <a href="#efficiency"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20h18"/><path d="M4 16l5-5 4 3 7-8"/></svg><span data-i18n="navEff"></span></a>
+      <a href="#issues"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span data-i18n="navIssues"></span></a>
+      <a href="#method"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5l3 2"/></svg><span data-i18n="navMethod"></span></a>
+    </nav>
+    <div class="side-foot">
+      <span>UNSA · 2026-B</span>
+      <span data-i18n="course"></span>
+      <a href="https://github.com/OwerLopez/vigisalud-iso5055" target="_blank" rel="noopener">github.com/OwerLopez</a>
+    </div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <div class="crumbs"><span>VigiSalud Arequipa</span><span>/</span><b data-i18n="crumb"></b></div>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Version" id="verSeg">
+          <button type="button" data-v="v01" aria-pressed="false">v0.1</button>
+          <button type="button" data-v="v02" aria-pressed="true">v0.2</button>
+        </div>
+        <div class="seg" role="group" aria-label="Language" id="langSeg">
+          <button type="button" data-l="en" aria-pressed="true">EN</button>
+          <button type="button" data-l="es" aria-pressed="false">ES</button>
+        </div>
+        <button class="iconbtn" type="button" id="themeBtn" aria-label="Toggle theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+        <a class="iconbtn" href="https://github.com/OwerLopez/vigisalud-iso5055" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.6 2.4 1.1 3 .9.1-.7.4-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg></a>
+      </div>
+    </div>
+
+    <div class="content">
+      <section id="overview">
+        <div class="hero">
+          <div>
+            <p class="eyebrow" data-i18n="eyebrow"></p>
+            <h1 data-i18n="title"></h1>
+            <p class="lede" id="lede"></p>
+          </div>
+          <div class="verdict" id="verdict"></div>
+        </div>
+        <div class="grid g-kpi" id="kpis"></div>
+        <div class="grid g-2">
+          <div class="card">
+            <h3 data-i18n="targetsT"></h3>
+            <p class="note" data-i18n="targetsN"></p>
+            <div class="chart" id="chTargets"></div>
+            <div class="legend" id="lgTargets"></div>
+          </div>
+          <div class="card">
+            <h3 data-i18n="processT"></h3>
+            <p class="note" data-i18n="processN"></p>
+            <div class="steps" id="steps"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="scorecard">
+        <div class="sec-head"><div><h2 data-i18n="scoreT"></h2><p data-i18n="scoreN"></p></div>
+          <div class="seg" role="group" aria-label="Group" id="grpSeg"></div></div>
+        <div class="tablewrap" style="max-height:none">
+          <table id="tblScore"><thead><tr>
+            <th data-i18n="thCode"></th><th data-i18n="thIndicator"></th><th class="hide-sm" data-i18n="thTarget"></th>
+            <th class="n">v0.1</th><th data-i18n="thStatus"></th><th class="n">v0.2</th><th data-i18n="thStatus"></th>
+          </tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <section id="weaknesses">
+        <div class="sec-head"><div><h2 data-i18n="weakT"></h2><p data-i18n="weakN"></p></div></div>
+        <div class="grid g-2">
+          <div class="card">
+            <h3 data-i18n="measT"></h3>
+            <p class="note" data-i18n="measN"></p>
+            <div class="legend" id="lgMeas"></div>
+            <div class="chart" id="chMeas"></div>
+          </div>
+          <div class="card">
+            <h3 data-i18n="cweT"></h3>
+            <p class="note" data-i18n="cweN"></p>
+            <div class="chart" id="chCwe"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3 data-i18n="covT"></h3>
+          <p class="note" data-i18n="covN"></p>
+          <div class="chart" id="chCov"></div>
+        </div>
+      </section>
+
+      <section id="efficiency">
+        <div class="sec-head"><div><h2 data-i18n="effT"></h2><p data-i18n="effN"></p></div></div>
+        <div class="grid g-2">
+          <div class="card">
+            <h3 data-i18n="scaleT"></h3>
+            <p class="note" data-i18n="scaleN"></p>
+            <div class="legend" id="lgScale"></div>
+            <div class="chart" id="chScale"></div>
+          </div>
+          <div class="card">
+            <h3 data-i18n="effNumsT"></h3>
+            <div class="bignums" id="effNums"></div>
+            <h3 data-i18n="hotT" style="margin-top:6px"></h3>
+            <p class="note" data-i18n="hotN"></p>
+            <div class="chart" id="chHot"></div>
+            <div class="callout" id="lockNote"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="issues">
+        <div class="sec-head"><div><h2 data-i18n="issT"></h2><p data-i18n="issN"></p></div></div>
+        <div class="toolbar">
+          <input class="search" id="q" type="search" autocomplete="off">
+          <div class="seg" role="group" aria-label="Measure" id="measSeg"></div>
+          <span class="count" id="issCount"></span>
+        </div>
+        <div class="tablewrap">
+          <table id="tblIss"><thead><tr>
+            <th><button data-k="id">ID</button></th>
+            <th><button data-k="module" data-i18n="thModule"></button></th>
+            <th class="n"><button data-k="line" data-i18n="thLine"></button></th>
+            <th><button data-k="cwe">CWE</button></th>
+            <th><button data-k="name" data-i18n="thWeak"></button></th>
+            <th class="hide-sm"><button data-k="measures" data-i18n="thMeasures"></button></th>
+            <th class="hide-sm"><button data-k="tool" data-i18n="thTool"></button></th>
+            <th data-i18n="thStatus"></th>
+          </tr></thead><tbody></tbody></table>
+        </div>
+      </section>
+
+      <section id="method">
+        <div class="sec-head"><div><h2 data-i18n="methT"></h2></div></div>
+        <div class="card meth" id="meth"></div>
+      </section>
+
+      <footer class="foot">
+        <span data-i18n="footL"></span>
+        <span><a href="https://github.com/OwerLopez/vigisalud-iso5055" target="_blank" rel="noopener">github.com/OwerLopez/vigisalud-iso5055</a> · OwerLopez</span>
+      </footer>
+    </div>
+  </main>
+</div>
+<div class="tip" id="tip" role="status" aria-live="polite"></div>
+
+<script>
+const D = {"indicators": [{"code": "IC-01", "group": "quality", "name": {"en": "Maintainability weakness density", "es": "Densidad de debilidades de mantenibilidad"}, "unit": {"en": "weaknesses/KSLOC", "es": "debilidades/KSLOC"}, "better": "lower", "green": 2.0, "amber": 5.0, "v01": 18.07, "v02": 0.0, "s_v01": "critical", "s_v02": "good"}, {"code": "IC-02", "group": "quality", "name": {"en": "Reliability weakness density", "es": "Densidad de debilidades de fiabilidad"}, "unit": {"en": "weaknesses/KSLOC", "es": "debilidades/KSLOC"}, "better": "lower", "green": 1.0, "amber": 3.0, "v01": 60.24, "v02": 0.0, "s_v01": "critical", "s_v02": "good"}, {"code": "IC-03", "group": "quality", "name": {"en": "Security weakness density", "es": "Densidad de debilidades de seguridad"}, "unit": {"en": "weaknesses/KSLOC", "es": "debilidades/KSLOC"}, "better": "lower", "green": 0.0, "amber": 2.0, "v01": 48.19, "v02": 0.0, "s_v01": "critical", "s_v02": "good"}, {"code": "IC-04", "group": "quality", "name": {"en": "Functions with excessive complexity", "es": "Funciones con complejidad excesiva"}, "unit": {"en": "%", "es": "%"}, "better": "lower", "green": 5.0, "amber": 10.0, "v01": 4.76, "v02": 0.0, "s_v01": "good", "s_v02": "good"}, {"code": "IC-05", "group": "quality", "name": {"en": "Maintainability index", "es": "Índice de mantenibilidad"}, "unit": {"en": "points (0-100)", "es": "puntos (0-100)"}, "better": "higher", "green": 50.0, "amber": 38.0, "v01": 60.61, "v02": 65.88, "s_v01": "good", "s_v02": "good"}, {"code": "IC-06", "group": "quality", "name": {"en": "Duplicated code", "es": "Código duplicado"}, "unit": {"en": "%", "es": "%"}, "better": "lower", "green": 3.0, "amber": 5.0, "v01": 3.92, "v02": 0.0, "s_v01": "warning", "s_v02": "good"}, {"code": "IE-01", "group": "efficiency", "name": {"en": "Performance-efficiency weakness density", "es": "Densidad de debilidades de eficiencia"}, "unit": {"en": "weaknesses/KSLOC", "es": "debilidades/KSLOC"}, "better": "lower", "green": 1.0, "amber": 3.0, "v01": 66.27, "v02": 0.0, "s_v01": "critical", "s_v02": "good"}, {"code": "IE-02", "group": "efficiency", "name": {"en": "Weekly processing time", "es": "Tiempo de procesamiento semanal"}, "unit": {"en": "s", "es": "segundos"}, "better": "lower", "green": 2.0, "amber": 5.0, "v01": 3.9399, "v02": 0.1847, "s_v01": "warning", "s_v02": "good"}, {"code": "IE-03", "group": "efficiency", "name": {"en": "Throughput", "es": "Rendimiento (throughput)"}, "unit": {"en": "notifications/s", "es": "notificaciones/s"}, "better": "higher", "green": 10000.0, "amber": 4000.0, "v01": 5076.3, "v02": 108283.7, "s_v01": "warning", "s_v02": "good"}, {"code": "IE-04", "group": "efficiency", "name": {"en": "Peak memory", "es": "Memoria pico"}, "unit": {"en": "MB", "es": "MB"}, "better": "lower", "green": 50.0, "amber": 100.0, "v01": 22.68, "v02": 24.61, "s_v01": "good", "s_v02": "good"}, {"code": "IE-05", "group": "efficiency", "name": {"en": "Scalability exponent", "es": "Exponente de escalabilidad"}, "unit": {"en": "", "es": ""}, "better": "lower", "green": 1.2, "amber": 1.5, "v01": 1.326, "v02": 0.735, "s_v01": "warning", "s_v02": "good"}, {"code": "IE-06", "group": "efficiency", "name": {"en": "Cost concentration (hotspot)", "es": "Concentración del costo (hotspot)"}, "unit": {"en": "%", "es": "%"}, "better": "lower", "green": 30.0, "amber": 50.0, "v01": 51.6, "v02": 21.0, "s_v01": "critical", "s_v02": "good"}, {"code": "IR-01", "group": "review", "name": {"en": "Finding resolution rate", "es": "Tasa de resolución de hallazgos"}, "unit": {"en": "%", "es": "%"}, "better": "higher", "green": 90.0, "amber": 70.0, "v01": null, "v02": 100.0, "s_v01": "na", "s_v02": "good"}], "measures": [{"key": "ASCMM", "name": {"en": "Maintainability", "es": "Mantenibilidad"}, "total": 29, "covered": 10, "v01": 6, "v02": 0}, {"key": "ASCPEM", "name": {"en": "Performance efficiency", "es": "Eficiencia de desempeño"}, "total": 18, "covered": 8, "v01": 22, "v02": 0}, {"key": "ASCRM", "name": {"en": "Reliability", "es": "Fiabilidad"}, "total": 74, "covered": 7, "v01": 20, "v02": 0}, {"key": "ASCSM", "name": {"en": "Security", "es": "Seguridad"}, "total": 73, "covered": 12, "v01": 16, "v02": 0}], "cwe": [{"cwe": 772, "n": 6, "measures": ["ASCPEM", "ASCRM", "ASCSM"], "name": {"en": "Resource not released", "es": "Recurso no liberado"}}, {"cwe": 1072, "n": 5, "measures": ["ASCPEM"], "name": {"en": "No connection reuse", "es": "Sin reutilizar conexiones"}}, {"cwe": 89, "n": 4, "measures": ["ASCSM"], "name": {"en": "SQL injection", "es": "Inyección SQL"}}, {"cwe": 1046, "n": 4, "measures": ["ASCPEM"], "name": {"en": "String concat in loop", "es": "Concatenación en bucle"}}, {"cwe": 390, "n": 4, "measures": ["ASCRM"], "name": {"en": "Error without action", "es": "Error sin acción"}}, {"cwe": 703, "n": 4, "measures": ["ASCRM"], "name": {"en": "Exception handling", "es": "Manejo de excepciones"}}, {"cwe": 775, "n": 2, "measures": ["ASCPEM", "ASCRM", "ASCSM"], "name": {"en": "File handle not released", "es": "Archivo no cerrado"}}, {"cwe": 1067, "n": 2, "measures": ["ASCPEM"], "name": {"en": "Sequential searches", "es": "Búsquedas secuenciales"}}, {"cwe": 369, "n": 2, "measures": ["ASCRM", "ASCSM"], "name": {"en": "Divide by zero", "es": "División por cero"}}, {"cwe": 1060, "n": 1, "measures": ["ASCPEM"], "name": {"en": "Queries inside loop", "es": "Consultas en bucle"}}, {"cwe": 1088, "n": 1, "measures": ["ASCRM"], "name": {"en": "Remote call w/o timeout", "es": "Red sin timeout"}}, {"cwe": 1051, "n": 1, "measures": ["ASCMM", "ASCRM"], "name": {"en": "Hard-coded network", "es": "Red codificada"}}, {"cwe": 798, "n": 1, "measures": ["ASCSM"], "name": {"en": "Hard-coded credentials", "es": "Credencial codificada"}}, {"cwe": 1041, "n": 1, "measures": ["ASCMM"], "name": {"en": "Copy-paste code", "es": "Código duplicado"}}, {"cwe": 1057, "n": 1, "measures": ["ASCPEM", "ASCSM"], "name": {"en": "SQL outside data layer", "es": "SQL fuera del repositorio"}}, {"cwe": 1085, "n": 1, "measures": ["ASCMM"], "name": {"en": "Commented-out code", "es": "Código comentado"}}, {"cwe": 561, "n": 1, "measures": ["ASCMM"], "name": {"en": "Dead code", "es": "Código muerto"}}, {"cwe": 1050, "n": 1, "measures": ["ASCPEM"], "name": {"en": "Resource use in loop", "es": "Recurso en bucle"}}, {"cwe": 1064, "n": 1, "measures": ["ASCMM"], "name": {"en": "Too many parameters", "es": "Exceso de parámetros"}}, {"cwe": 1121, "n": 1, "measures": ["ASCMM"], "name": {"en": "High McCabe complexity", "es": "Complejidad excesiva"}}], "issues": [{"id": "F-01", "module": "alertas", "line": 31, "cwe": 1060, "measures": ["ASCPEM"], "tool": "Detector AST", "rule": "query-in-loop", "name": {"en": "Queries inside loop", "es": "Consultas en bucle"}}, {"id": "F-02", "module": "alertas", "line": 61, "cwe": 772, "measures": ["ASCPEM", "ASCRM", "ASCSM"], "tool": "Detector AST", "rule": "resource-not-released", "name": {"en": "Resource not released", "es": "Recurso no liberado"}}, {"id": "F-03", "module": "alertas", "line": 61, "cwe": 1088, "measures": ["ASCRM"], "tool": "Detector AST", "rule": "remote-no-timeout", "name": {"en": "Remote call w/o timeout", "es": "Red sin timeout"}}, {"id": "F-04", "module": "config", "line": 5, "cwe": 1051, "measures": ["ASCMM", "ASCRM"], "tool": "Detector AST", "rule": "hardcoded-network", "name": {"en": "Hard-coded network", "es": "Red codificada"}}, {"id": "F-05", "module": "config", "line": 8, "cwe": 798, "measures": ["ASCSM"], "tool": "Detector AST", "rule": "hardcoded-credential", "name": {"en": "Hard-coded credentials", "es": "Credencial codificada"}}, {"id": "F-06", "module": "datos", "line": 22, "cwe": 775, "measures": ["ASCPEM", "ASCRM", "ASCSM"], "tool": "Detector AST", "rule": "resource-not-released", "name": {"en": "File handle not released", "es": "Archivo no cerrado"}}, {"id": "F-07", "module": "datos", "line": 32, "cwe": 1067, "measures": ["ASCPEM"], "tool": "Detector AST", "rule": "linear-search", "name": {"en": "Sequential searches", "es": "Búsquedas secuenciales"}}, {"id": "F-08", "module": "indicadores", "line": 21, "cwe": 369, "measures": ["ASCRM", "ASCSM"], "tool": "Detector AST", "rule": "unchecked-division", "name": {"en": "Divide by zero", "es": "División por cero"}}, {"id": "F-09", "module": "indicadores", "line": 39, "cwe": 369, "measures": ["ASCRM", "ASCSM"], "tool": "Detector AST", "rule": "unchecked-division", "name": {"en": "Divide by zero", "es": "División por cero"}}, {"id": "F-10", "module": "reportes", "line": 8, "cwe": 1041, "measures": ["ASCMM"], "tool": "Pylint", "rule": "R0801 duplicate-code", "name": {"en": "Copy-paste code", "es": "Código duplicado"}}, {"id": "F-11", "module": "reportes", "line": 21, "cwe": 772, "measures": ["ASCPEM", "ASCRM", "ASCSM"], "tool": "Detector AST", "rule": "resource-not-released", "name": {"en": "Resource not released", "es": "Recurso no liberado"}}, {"id": "F-12", "module": "reportes", "line": 21, "cwe": 1072, "measures": ["ASCPEM"], "tool": "Detector AST", "rule": "no-connection-reuse", "name": {"en": "No connection reuse", "es": "Sin reutilizar conexiones"}}, {"id": "F-13", "module": "reportes", "line": 22, "cwe": 1057, "measures": ["ASCPEM", "ASCSM"], "tool": "Detector AST", "rule": "data-access-outside-dal", "name": {"en": "SQL outside data layer", "es": "SQL fuera del repositorio"}}, {"id": "F-14", "module": "reportes", "line": 23, "cwe": 89, "measures": ["ASCSM"], "tool": "Bandit", "rule": "B608 hardcoded_sql_expressions", "name": {"en": "SQL injection", "es": "Inyección SQL"}}, {"id": "F-15", "module": "reportes", "line": 33, "cwe": 1046, "measures": ["ASCPEM"], "tool": "Detector AST", "rule": "str-concat-loop", "name": {"en": "String concat in loop", "es": "Concatenación en bucle"}}, {"id": "F-16", "module": "reportes", "line": 36, "cwe": 1046, "measures": ["ASCPEM"], "tool": "Detector AST", "rule": "str-concat-loop", "name": {"en": "String concat in loop", "es": "Concatenación en bucle"}}, {"id": "F-17", "module": "reportes", "line": 41, "cwe": 1046, "measures": ["ASCPEM"], "tool": "Detector AST", "rule": "str-concat-loop", "name": {"en": "String concat in loop", "es": "Concatenación en bucle"}}, {"id": "F-18", "module": "reportes", "line": 46, "cwe": 1046, "measures": ["ASCPEM"], "tool": "Detector AST", "rule": "str-concat-loop", "name": {"en": "String concat in loop", "es": "Concatenación en bucle"}}, {"id": "F-19", "module": "reportes", "line": 49, "cwe": 1085, "measures": ["ASCMM"], "tool": "Detector AST", "rule": "commented-out-code", "name": {"en": "Commented-out code", "es": "Código comentado"}}, {"id": "F-20", "module": "reportes", "line": 52, "cwe": 775, "measures": ["ASCPEM", "ASCRM", "ASCSM"], "tool": "Detector AST", "rule": "resource-not-released", "name": {"en": "File handle not released", "es": "Archivo no cerrado"}}, {"id": "F-21", "module": "reportes", "line": 55, "cwe": 561, "measures": ["ASCMM"], "tool": "Pylint", "rule": "W0101 unreachable", "name": {"en": "Dead code", "es": "Código muerto"}}, {"id": "F-22", "module": "repositorio", "line": 8, "cwe": 772, "measures": ["ASCPEM", "ASCRM", "ASCSM"], "tool": "Detector AST", "rule": "resource-not-released", "name": {"en": "Resource not released", "es": "Recurso no liberado"}}, {"id": "F-23", "module": "repositorio", "line": 8, "cwe": 1072, "measures": ["ASCPEM"], "tool": "Detector AST", "rule": "no-connection-reuse", "name": {"en": "No connection reuse", "es": "Sin reutilizar conexiones"}}, {"id": "F-24", "module": "repositorio", "line": 20, "cwe": 772, "measures": ["ASCPEM", "ASCRM", "ASCSM"], "tool": "Detector AST", "rule": "resource-not-released", "name": {"en": "Resource not released", "es": "Recurso no liberado"}}, {"id": "F-25", "module": "repositorio", "line": 20, "cwe": 1072, "measures": ["ASCPEM"], "tool": "Detector AST", "rule": "no-connection-reuse", "name": {"en": "No connection reuse", "es": "Sin reutilizar conexiones"}}, {"id": "F-26", "module": "repositorio", "line": 22, "cwe": 1050, "measures": ["ASCPEM"], "tool": "Detector AST", "rule": "resource-in-loop", "name": {"en": "Resource use in loop", "es": "Recurso en bucle"}}, {"id": "F-27", "module": "repositorio", "line": 23, "cwe": 89, "measures": ["ASCSM"], "tool": "Bandit", "rule": "B608 hardcoded_sql_expressions", "name": {"en": "SQL injection", "es": "Inyección SQL"}}, {"id": "F-28", "module": "repositorio", "line": 32, "cwe": 772, "measures": ["ASCPEM", "ASCRM", "ASCSM"], "tool": "Detector AST", "rule": "resource-not-released", "name": {"en": "Resource not released", "es": "Recurso no liberado"}}, {"id": "F-29", "module": "repositorio", "line": 32, "cwe": 1072, "measures": ["ASCPEM"], "tool": "Detector AST", "rule": "no-connection-reuse", "name": {"en": "No connection reuse", "es": "Sin reutilizar conexiones"}}, {"id": "F-30", "module": "repositorio", "line": 34, "cwe": 89, "measures": ["ASCSM"], "tool": "Bandit", "rule": "B608 hardcoded_sql_expressions", "name": {"en": "SQL injection", "es": "Inyección SQL"}}, {"id": "F-31", "module": "repositorio", "line": 45, "cwe": 772, "measures": ["ASCPEM", "ASCRM", "ASCSM"], "tool": "Detector AST", "rule": "resource-not-released", "name": {"en": "Resource not released", "es": "Recurso no liberado"}}, {"id": "F-32", "module": "repositorio", "line": 45, "cwe": 1072, "measures": ["ASCPEM"], "tool": "Detector AST", "rule": "no-connection-reuse", "name": {"en": "No connection reuse", "es": "Sin reutilizar conexiones"}}, {"id": "F-33", "module": "repositorio", "line": 46, "cwe": 89, "measures": ["ASCSM"], "tool": "Bandit", "rule": "B608 hardcoded_sql_expressions", "name": {"en": "SQL injection", "es": "Inyección SQL"}}, {"id": "F-34", "module": "validacion", "line": 10, "cwe": 1064, "measures": ["ASCMM"], "tool": "Pylint + Pylint", "rule": "R0913 too-many-arguments", "name": {"en": "Too many parameters", "es": "Exceso de parámetros"}}, {"id": "F-35", "module": "validacion", "line": 17, "cwe": 1121, "measures": ["ASCMM"], "tool": "Radon", "rule": "cc>10", "name": {"en": "High McCabe complexity", "es": "Complejidad excesiva"}}, {"id": "F-36", "module": "validacion", "line": 35, "cwe": 390, "measures": ["ASCRM"], "tool": "Detector AST", "rule": "except-pass", "name": {"en": "Error without action", "es": "Error sin acción"}}, {"id": "F-37", "module": "validacion", "line": 35, "cwe": 703, "measures": ["ASCRM"], "tool": "Pylint + Bandit", "rule": "W0702 bare-except", "name": {"en": "Exception handling", "es": "Manejo de excepciones"}}, {"id": "F-38", "module": "validacion", "line": 42, "cwe": 390, "measures": ["ASCRM"], "tool": "Detector AST", "rule": "except-pass", "name": {"en": "Error without action", "es": "Error sin acción"}}, {"id": "F-39", "module": "validacion", "line": 42, "cwe": 703, "measures": ["ASCRM"], "tool": "Pylint + Bandit", "rule": "W0702 bare-except", "name": {"en": "Exception handling", "es": "Manejo de excepciones"}}, {"id": "F-40", "module": "validacion", "line": 49, "cwe": 390, "measures": ["ASCRM"], "tool": "Detector AST", "rule": "except-pass", "name": {"en": "Error without action", "es": "Error sin acción"}}, {"id": "F-41", "module": "validacion", "line": 49, "cwe": 703, "measures": ["ASCRM"], "tool": "Pylint + Bandit", "rule": "W0702 bare-except", "name": {"en": "Exception handling", "es": "Manejo de excepciones"}}, {"id": "F-42", "module": "validacion", "line": 56, "cwe": 390, "measures": ["ASCRM"], "tool": "Detector AST", "rule": "except-pass", "name": {"en": "Error without action", "es": "Error sin acción"}}, {"id": "F-43", "module": "validacion", "line": 56, "cwe": 703, "measures": ["ASCRM"], "tool": "Pylint + Bandit", "rule": "W0702 bare-except", "name": {"en": "Exception handling", "es": "Manejo de excepciones"}}, {"id": "F-44", "module": "validacion", "line": 80, "cwe": 1067, "measures": ["ASCPEM"], "tool": "Detector AST", "rule": "list-membership-loop", "name": {"en": "Sequential searches", "es": "Búsquedas secuenciales"}}], "curves": {"v01": [{"n": 2500, "t": 0.4616}, {"n": 5000, "t": 0.7507}, {"n": 10000, "t": 1.4719}, {"n": 20000, "t": 3.9399}, {"n": 40000, "t": 19.9341}], "v02": [{"n": 2500, "t": 0.046}, {"n": 5000, "t": 0.0638}, {"n": 10000, "t": 0.1029}, {"n": 20000, "t": 0.1847}, {"n": 40000, "t": 0.3453}]}, "hotspots": {"v01": [{"fn": "sqlite3.execute", "pct": 51.6}, {"fn": "validacion.py:73(validar_lote)", "pct": 34.6}, {"fn": "_sqlite3.connect", "pct": 4.6}], "v02": [{"fn": "validacion.py:53(validar_notificacion)", "pct": 21.0}, {"fn": "sqlite3.executemany", "pct": 18.4}, {"fn": "csv.py:112(__next__)", "pct": 10.5}]}, "locked": {"v01": "17/17", "v02": "0/17"}};
+const T = {
+  en: {
+    brandSub: "Code quality · ISO/IEC 5055", navOverview: "Overview", navScore: "Scorecard", navWeak: "Weaknesses",
+    navEff: "Efficiency", navIssues: "Issue log", navMethod: "Method", course: "Software Quality · TP5", crumb: "Quality dashboard",
+    eyebrow: "ISO/IEC 20246 review · ISO/IEC 5055 measures",
+    title: "Code quality and efficiency of a public-health surveillance system",
+    lede: (d) => `VigiSalud turns weekly dengue, ARI and ADD notifications from primary-care facilities into outbreak alerts. The review found ${d.found} ISO 5055 weaknesses in the baseline; after fixing them, weekly processing runs ${d.speed}× faster with identical outputs.`,
+    verdictL: "Targets met", verdictS: (v) => `version ${v}`,
+    k_weak: "ISO 5055 weaknesses", k_time: "Weekly processing time", k_thr: "Throughput", k_b: "Scalability exponent b", k_res: "Findings resolved",
+    k_target: "target", vs: "vs", na: "n/a",
+    status: { good: "Meets", warning: "Plan", critical: "Blocks", na: "No data" },
+    targetsT: "Indicator status by version", targetsN: "12 measurable targets in v0.1 and 13 in v0.2 (resolution rate needs a previous review).",
+    processT: "How the ISO/IEC 20246 review used the indicators", processN: "Five activities of clause 6.4, each fed by an ISO 5055 measure or a runtime indicator.",
+    steps: [["Planning", "Exit criteria = indicator thresholds", "6.4.1"], ["Initiate review", "Checklist = CWEs mapped to tool rules", "6.4.2"],
+            ["Individual review", "Tools detect CWEs and time the code", "6.4.3"], ["Issue analysis", "Issue log + traffic lights decide", "6.4.4"],
+            ["Fixing and reporting", "Re-measure; IR-01 confirms closure", "6.4.5"]],
+    scoreT: "Indicator scorecard", scoreN: "Each indicator sheet defines a formula, a unit and green/amber limits. Red blocks acceptance in the review.",
+    groups: { all: "All", quality: "Quality", efficiency: "Efficiency", review: "Review" },
+    thCode: "Code", thIndicator: "Indicator", thTarget: "Green target", thStatus: "Status", thModule: "Module", thLine: "Line",
+    thWeak: "Weakness", thMeasures: "Measures", thTool: "Tool",
+    better: { lower: "lower is better", higher: "higher is better" },
+    weakT: "ISO 5055 weaknesses", weakN: "Weaknesses are counted per occurrence (module, line, CWE). One CWE can count in several measures, as the standard defines.",
+    measT: "Occurrences per measure", measN: "Baseline against the version fixed after the review.",
+    cweT: "Baseline findings by CWE", cweN: "Unreleased resources and missing connection reuse lead.",
+    covT: "Toolchain coverage of each measure", covN: "CWEs of each measure the Python toolchain can detect. Many reliability and security CWEs are C/C++ memory faults that cannot occur in Python.",
+    covered: "covered", of: "of",
+    effT: "Efficiency at runtime", effN: "Seeded synthetic data, fresh process per run, median of 5 runs at the reference load (3 elsewhere).",
+    scaleT: "Processing time as the load grows", scaleN: "Both axes logarithmic: a steeper line means worse scaling.",
+    xN: "notifications (N)", yT: "seconds", effNumsT: "Before and after",
+    e_20: "20,000 notifications", e_40: "40,000 notifications", e_mem: "peak memory (MB)",
+    hotT: "Where the time goes", hotN: "Top functions by own time (cProfile, 20,000 notifications).",
+    lock: (a) => `<b>Runtime evidence of CWE-772.</b> The baseline left the database locked in ${a} benchmark runs because connections were never closed; v0.2 locked it in none.`,
+    issT: "Issue log of the review", issN: "Every baseline finding with the rule that reported it. All of them were fixed in v0.2.",
+    search: "Search module, CWE, weakness or tool", showing: (n, m) => `${n} of ${m} findings`, fixed: "Fixed in v0.2",
+    methT: "Method and sources",
+    meth: [["Measures", "Radon (complexity, maintainability index, size), Pylint and Bandit rules mapped to ISO 5055 CWEs, plus 13 project AST detectors for Python patterns the tools miss."],
+           ["Runtime", "time.perf_counter, tracemalloc and cProfile on Python 3.12. Loads of 2,500 to 40,000 seeded synthetic notifications; no patient data."],
+           ["Standards", "ISO/IEC 20246:2017 work product reviews (clause 6) and ISO/IEC 5055:2021 automated source code quality measures (clause 7)."],
+           ["Reproduce", "python medicion/medir_todo.py measures both versions and rebuilds the data behind this page."]],
+    footL: "UNSA · School of Systems Engineering · Software Quality, Partial Assignment 5 · 2026-B",
+    series: { v01: "v0.1 baseline", v02: "v0.2 after review" },
+  },
+  es: {
+    brandSub: "Calidad de código · ISO/IEC 5055", navOverview: "Resumen", navScore: "Indicadores", navWeak: "Debilidades",
+    navEff: "Eficiencia", navIssues: "Registro", navMethod: "Método", course: "Calidad de Software · TP5", crumb: "Panel de calidad",
+    eyebrow: "Revisión ISO/IEC 20246 · Medidas ISO/IEC 5055",
+    title: "Calidad y eficiencia del código de un sistema de vigilancia en salud pública",
+    lede: (d) => `VigiSalud convierte las notificaciones semanales de dengue, IRA y EDA de los establecimientos del primer nivel en alertas de brote. La revisión encontró ${d.found} debilidades ISO 5055 en la línea base; tras corregirlas, el procesamiento semanal es ${d.speed} veces más rápido con resultados idénticos.`,
+    verdictL: "Metas cumplidas", verdictS: (v) => `versión ${v}`,
+    k_weak: "Debilidades ISO 5055", k_time: "Tiempo de procesamiento semanal", k_thr: "Rendimiento", k_b: "Exponente de escalabilidad b", k_res: "Hallazgos resueltos",
+    k_target: "meta", vs: "frente a", na: "s. d.",
+    status: { good: "Cumple", warning: "Plan", critical: "Bloquea", na: "Sin dato" },
+    targetsT: "Estado de los indicadores por versión", targetsN: "12 metas medibles en v0.1 y 13 en v0.2 (la tasa de resolución requiere una revisión previa).",
+    processT: "Cómo usó los indicadores la revisión ISO/IEC 20246", processN: "Cinco actividades de la cláusula 6.4, cada una alimentada por una medida ISO 5055 o un indicador de ejecución.",
+    steps: [["Planificación", "Criterios de salida = umbrales", "6.4.1"], ["Inicio de la revisión", "Lista de verificación = CWE mapeados", "6.4.2"],
+            ["Revisión individual", "Las herramientas detectan CWE y miden tiempos", "6.4.3"], ["Análisis de hallazgos", "Registro + semáforo deciden", "6.4.4"],
+            ["Corrección y reporte", "Se vuelve a medir; IR-01 confirma el cierre", "6.4.5"]],
+    scoreT: "Tablero de indicadores", scoreN: "Cada ficha define fórmula, unidad y límites verde y ámbar. El rojo bloquea la aceptación en la revisión.",
+    groups: { all: "Todos", quality: "Calidad", efficiency: "Eficiencia", review: "Revisión" },
+    thCode: "Código", thIndicator: "Indicador", thTarget: "Meta verde", thStatus: "Estado", thModule: "Módulo", thLine: "Línea",
+    thWeak: "Debilidad", thMeasures: "Medidas", thTool: "Herramienta",
+    better: { lower: "menor es mejor", higher: "mayor es mejor" },
+    weakT: "Debilidades ISO 5055", weakN: "Se cuenta cada ocurrencia (módulo, línea, CWE). Un CWE puede contar en varias medidas, como define la norma.",
+    measT: "Ocurrencias por medida", measN: "Línea base frente a la versión corregida tras la revisión.",
+    cweT: "Hallazgos de la línea base por CWE", cweN: "Predominan los recursos no liberados y las conexiones sin reutilizar.",
+    covT: "Cobertura de cada medida por la herramienta", covN: "CWE de cada medida que la herramienta para Python puede detectar. Muchos CWE de fiabilidad y seguridad son fallas de memoria de C/C++ que no ocurren en Python.",
+    covered: "cubiertos", of: "de",
+    effT: "Eficiencia en ejecución", effN: "Datos sintéticos con semilla, proceso nuevo por ejecución, mediana de 5 ejecuciones en la carga de referencia (3 en las demás).",
+    scaleT: "Tiempo de procesamiento según la carga", scaleN: "Ambos ejes logarítmicos: una línea más empinada indica peor escalabilidad.",
+    xN: "notificaciones (N)", yT: "segundos", effNumsT: "Antes y después",
+    e_20: "20 000 notificaciones", e_40: "40 000 notificaciones", e_mem: "memoria pico (MB)",
+    hotT: "Dónde se va el tiempo", hotN: "Funciones con más tiempo propio (cProfile, 20 000 notificaciones).",
+    lock: (a) => `<b>Evidencia en ejecución de CWE-772.</b> La línea base dejó la base de datos bloqueada en ${a} ejecuciones del benchmark porque nunca cerraba las conexiones; v0.2 no la bloqueó en ninguna.`,
+    issT: "Registro de hallazgos de la revisión", issN: "Cada hallazgo de la línea base con la regla que lo reportó. Todos se corrigieron en v0.2.",
+    search: "Buscar módulo, CWE, debilidad o herramienta", showing: (n, m) => `${n} de ${m} hallazgos`, fixed: "Corregido en v0.2",
+    methT: "Método y fuentes",
+    meth: [["Medidas", "Radon (complejidad, índice de mantenibilidad, tamaño), reglas de Pylint y Bandit mapeadas a CWE de la ISO 5055 y 13 detectores AST propios para patrones de Python que esas herramientas no cubren."],
+           ["Ejecución", "time.perf_counter, tracemalloc y cProfile en Python 3.12. Cargas de 2 500 a 40 000 notificaciones sintéticas con semilla; sin datos de pacientes."],
+           ["Normas", "ISO/IEC 20246:2017, revisiones de productos de trabajo (cláusula 6), e ISO/IEC 5055:2021, medidas automatizadas de calidad del código fuente (cláusula 7)."],
+           ["Reproducir", "python medicion/medir_todo.py mide ambas versiones y regenera los datos de esta página."]],
+    footL: "UNSA · Escuela Profesional de Ingeniería de Sistemas · Calidad de Software, Trabajo Parcial 5 · 2026-B",
+    series: { v01: "v0.1 línea base", v02: "v0.2 tras la revisión" },
+  },
+};
+
+const state = { lang: "en", ver: "v02", group: "all", meas: "all", q: "", sort: "id", dir: 1 };
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+const qp = new URLSearchParams(location.search).get("lang");
+state.lang = qp === "es" || qp === "en" ? qp : (store.get("vs-lang") || ((navigator.language || "").startsWith("es") ? "es" : "en"));
+const t = (k) => T[state.lang][k];
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const loc = () => (state.lang === "es" ? "es-PE" : "en-US");
+const fmt = (v, d = 2) => (v === null || v === undefined ? "—" : new Intl.NumberFormat(loc(), { minimumFractionDigits: d, maximumFractionDigits: d }).format(v));
+const IND = Object.fromEntries(D.indicators.map((i) => [i.code, i]));
+const DEC = { "IE-03": 0, "IE-06": 1, "IR-01": 0, "IE-05": 2 };
+const fmtI = (code, v) => fmt(v, DEC[code] ?? 2);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const badge = (s) => `<span class="badge ${s}"><i aria-hidden="true">${{ good: "✓", warning: "!", critical: "✕", na: "–" }[s]}</i>${t("status")[s]}</span>`;
+
+/* ---------- tooltip */
+const tip = document.getElementById("tip");
+function showTip(ev, title, rows) {
+  tip.innerHTML = `<div class="t">${esc(title)}</div>` + rows.map(([sw, k, v]) =>
+    `<div class="r"><span>${sw ? `<span class="sw" style="background:${sw}"></span>` : ""}${esc(k)}</span><b>${esc(v)}</b></div>`).join("");
+  tip.classList.add("on");
+  const pad = 14, w = tip.offsetWidth, h = tip.offsetHeight;
+  let x = ev.pageX + pad, y = ev.pageY - h - pad;
+  if (x + w > window.scrollX + document.documentElement.clientWidth - 8) x = ev.pageX - w - pad;
+  if (y < window.scrollY + 8) y = ev.pageY + pad;
+  tip.style.left = `${x}px`; tip.style.top = `${y}px`;
+}
+const hideTip = () => tip.classList.remove("on");
+
+/* ---------- static text */
+function applyText() {
+  document.documentElement.lang = state.lang;
+  document.querySelectorAll("[data-i18n]").forEach((el) => { const v = t(el.dataset.i18n); if (typeof v === "string") el.textContent = v; });
+  document.getElementById("lede").textContent = t("lede")({ found: D.issues.length, speed: Math.round(IND["IE-02"].v01 / IND["IE-02"].v02) });
+  document.getElementById("q").placeholder = t("search");
+  document.getElementById("q").setAttribute("aria-label", t("search"));
+  document.title = state.lang === "es" ? "Panel de calidad VigiSalud" : "VigiSalud Quality Dashboard";
+  document.getElementById("steps").innerHTML = t("steps").map(([a, b, c]) => `<div class="step"><em>${c}</em><b>${a}</b>${b}</div>`).join("");
+  document.getElementById("meth").innerHTML = t("meth").map(([a, b]) => `<div><h3>${a}</h3><p>${b}</p></div>`).join("");
+  document.getElementById("lockNote").innerHTML = t("lock")(D.locked.v01);
+  document.getElementById("grpSeg").innerHTML = Object.entries(t("groups")).map(([k, v]) => `<button type="button" data-g="${k}" aria-pressed="${state.group === k}">${v}</button>`).join("");
+  const ms = ["all", "ASCMM", "ASCPEM", "ASCRM", "ASCSM"];
+  document.getElementById("measSeg").innerHTML = ms.map((m) => `<button type="button" data-m="${m}" aria-pressed="${state.meas === m}">${m === "all" ? t("groups").all : m}</button>`).join("");
+  document.querySelectorAll("#langSeg button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.l === state.lang));
+  document.querySelectorAll("#verSeg button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.v === state.ver));
+  const lg = (el, items) => { document.getElementById(el).innerHTML = items.map(([c, l]) => `<span><i style="background:${c}"></i>${l}</span>`).join(""); };
+  lg("lgMeas", [[css("--s-old"), t("series").v01], [css("--s-new"), t("series").v02]]);
+  lg("lgScale", [[css("--s-old"), t("series").v01], [css("--s-new"), t("series").v02]]);
+  lg("lgTargets", [[css("--good"), t("status").good], [css("--warn"), t("status").warning], [css("--crit"), t("status").critical]]);
+}
+
+/* ---------- KPIs + verdict */
+function renderKpis() {
+  const v = state.ver, o = v === "v02" ? "v01" : "v02";
+  const weak = { v01: D.issues.length, v02: 0 };
+  const tiles = [
+    { k: "k_weak", code: "ISO 5055", val: weak[v], other: weak[o], d: 0, unit: "", status: weak[v] === 0 ? "good" : "critical" },
+    { k: "k_time", code: "IE-02", ind: "IE-02", unit: "s" },
+    { k: "k_thr", code: "IE-03", ind: "IE-03", unit: "/s" },
+    { k: "k_b", code: "IE-05", ind: "IE-05", unit: "" },
+    { k: "k_res", code: "IR-01", ind: "IR-01", unit: "%" },
+  ];
+  document.getElementById("kpis").innerHTML = tiles.map((x) => {
+    let val, other, status, target = "";
+    if (x.ind) {
+      const i = IND[x.ind];
+      val = i[v]; other = i[o]; status = i[`s_${v}`];
+      target = `${t("k_target")} ${i.better === "lower" ? "≤" : "≥"} ${fmtI(x.ind, i.green)}${x.unit === "%" ? "%" : x.unit === "s" ? " s" : ""}`;
+    } else { val = x.val; other = x.other; status = x.status; }
+    const shown = val === null || val === undefined ? t("na") : (x.ind ? fmtI(x.ind, val) : fmt(val, 0));
+    const vs = other === null || other === undefined ? "" : `<span class="delta">${o === "v01" ? "v0.1" : "v0.2"}: ${x.ind ? fmtI(x.ind, other) : fmt(other, 0)}</span>`;
+    return `<div class="card kpi"><div class="lab"><span>${t(x.k)}</span><span class="code">${x.code}</span></div>
+      <div class="val num">${shown}${x.unit && shown !== t("na") ? `<small>${x.unit}</small>` : ""}</div>
+      <div class="foot">${badge(status)}${vs}${target ? `<span>${target}</span>` : ""}</div></div>`;
+  }).join("");
+  const scored = D.indicators.filter((i) => i[`s_${v}`] !== "na");
+  const met = scored.filter((i) => i[`s_${v}`] === "good").length;
+  document.getElementById("verdict").innerHTML = `<small>${t("verdictL")} · ${t("verdictS")(v === "v01" ? "v0.1" : "v0.2")}</small>
+    <div class="big num">${met}<span> / ${scored.length}</span></div>${badge(met === scored.length ? "good" : "critical")}`;
+}
+
+/* ---------- chart helpers */
+function svgIn(el, w, h) {
+  const box = document.getElementById(el); box.innerHTML = "";
+  return d3.select(box).append("svg").attr("viewBox", `0 0 ${w} ${h}`).attr("role", "img");
+}
+const width = (el) => Math.max(300, document.getElementById(el).clientWidth);
+const measName = (k) => D.measures.find((m) => m.key === k).name[state.lang];
+
+function renderTargets() {
+  const W = width("chTargets"), rowH = 34, H = 2 * rowH + 30, L = 112;
+  const svg = svgIn("chTargets", W, H);
+  const x = d3.scaleLinear([0, 13], [L, W - 8]);
+  ["v01", "v02"].forEach((v, r) => {
+    const c = { good: 0, warning: 0, critical: 0 };
+    D.indicators.forEach((i) => { if (c[i[`s_${v}`]] !== undefined) c[i[`s_${v}`]] += 1; });
+    const y = 8 + r * (rowH + 10);
+    svg.append("text").attr("x", 0).attr("y", y + rowH / 2).attr("dy", "0.35em").text(t("series")[v]);
+    let acc = 0;
+    [["good", "--good"], ["warning", "--warn"], ["critical", "--crit"]].forEach(([k, col]) => {
+      if (!c[k]) return;
+      const x0 = x(acc), x1 = x(acc + c[k]);
+      svg.append("rect").attr("x", x0 + 1).attr("y", y).attr("width", Math.max(0, x1 - x0 - 2)).attr("height", rowH).attr("rx", 4).attr("fill", css(col))
+        .on("mousemove", (e) => showTip(e, t("series")[v], [[css(col), t("status")[k], c[k]]])).on("mouseleave", hideTip);
+      svg.append("text").attr("x", (x0 + x1) / 2).attr("y", y + rowH / 2).attr("dy", "0.35em").attr("text-anchor", "middle")
+        .attr("class", "val-l").style("fill", k === "warning" ? "#3A2A00" : "#fff").text(c[k]);
+      acc += c[k];
+    });
+  });
+}
+
+function renderMeasures() {
+  const W = width("chMeas"), barH = 14, gap = 4, groupH = barH * 2 + gap + 18, L = 128, R = 36;
+  const H = D.measures.length * groupH + 4;
+  const svg = svgIn("chMeas", W, H);
+  const max = d3.max(D.measures, (m) => Math.max(m.v01, m.v02));
+  const x = d3.scaleLinear([0, max], [L, W - R]);
+  D.measures.forEach((m, i) => {
+    const y0 = i * groupH;
+    svg.append("text").attr("x", 0).attr("y", y0 + barH + gap / 2).attr("dy", "0.35em").text(m.name[state.lang]);
+    [["v01", "--s-old"], ["v02", "--s-new"]].forEach(([v, col], j) => {
+      const y = y0 + j * (barH + gap), val = m[v];
+      const wbar = Math.max(val ? 3 : 0, x(val) - x(0));
+      if (val) svg.append("rect").attr("x", x(0)).attr("y", y).attr("width", wbar).attr("height", barH).attr("rx", 4).attr("fill", css(col));
+      else svg.append("rect").attr("x", x(0)).attr("y", y + barH / 2 - 1).attr("width", 6).attr("height", 2).attr("fill", css(col));
+      svg.append("text").attr("x", x(0) + wbar + 6).attr("y", y + barH / 2).attr("dy", "0.35em").attr("class", "val-l").text(val);
+      svg.append("rect").attr("x", 0).attr("y", y - 1).attr("width", W).attr("height", barH + 2).attr("fill", "transparent")
+        .on("mousemove", (e) => showTip(e, `${m.name[state.lang]} (${m.key})`, [[css("--s-old"), "v0.1", m.v01], [css("--s-new"), "v0.2", m.v02]])).on("mouseleave", hideTip);
+    });
+  });
+}
+
+function renderCwe() {
+  const W = width("chCwe"), rowH = 22;
+  const rows = D.cwe;
+  const H = rows.length * rowH + 4;
+  const svg = svgIn("chCwe", W, H);
+  const L = Math.min(250, W * 0.58), R = 26;
+  const x = d3.scaleLinear([0, d3.max(rows, (r) => r.n)], [L, W - R]);
+  rows.forEach((r, i) => {
+    const y = i * rowH;
+    const lab = svg.append("text").attr("x", L - 8).attr("y", y + rowH / 2).attr("dy", "0.35em").attr("text-anchor", "end").text(`CWE-${r.cwe} ${r.name[state.lang]}`);
+    while (lab.node().getComputedTextLength() > L - 12 && lab.text().length > 10) lab.text(lab.text().slice(0, -2) + "…");
+    svg.append("rect").attr("x", x(0)).attr("y", y + 4).attr("width", Math.max(3, x(r.n) - x(0))).attr("height", rowH - 8).attr("rx", 4).attr("fill", css("--s-old"));
+    svg.append("text").attr("x", x(r.n) + 6).attr("y", y + rowH / 2).attr("dy", "0.35em").attr("class", "val-l").text(r.n);
+    svg.append("rect").attr("x", 0).attr("y", y).attr("width", W).attr("height", rowH).attr("fill", "transparent")
+      .on("mousemove", (e) => showTip(e, `CWE-${r.cwe}`, [[null, r.name[state.lang], ""], [css("--s-old"), "v0.1", r.n], [null, t("thMeasures"), r.measures.join(", ")]])).on("mouseleave", hideTip);
+  });
+}
+
+function renderCoverage() {
+  const W = width("chCov"), rowH = 30, L = 150, R = 120;
+  const svg = svgIn("chCov", W, D.measures.length * rowH + 4);
+  const x = d3.scaleLinear([0, 1], [L, W - R]);
+  D.measures.forEach((m, i) => {
+    const y = i * rowH, share = m.covered / m.total;
+    svg.append("text").attr("x", 0).attr("y", y + rowH / 2).attr("dy", "0.35em").text(`${m.name[state.lang]}`);
+    svg.append("rect").attr("x", x(0)).attr("y", y + 9).attr("width", x(1) - x(0)).attr("height", rowH - 18).attr("rx", 4).attr("fill", css("--grid"));
+    svg.append("rect").attr("x", x(0)).attr("y", y + 9).attr("width", (x(1) - x(0)) * share).attr("height", rowH - 18).attr("rx", 4).attr("fill", css("--s-new"));
+    svg.append("text").attr("x", x(1) + 10).attr("y", y + rowH / 2).attr("dy", "0.35em").attr("class", "val-l")
+      .text(`${m.covered} ${t("of")} ${m.total} ${t("covered")}`);
+  });
+}
+
+function renderScale() {
+  const W = width("chScale"), H = Math.round(Math.min(340, W * 0.62)), m = { t: 12, r: 92, b: 34, l: 46 };
+  const svg = svgIn("chScale", W, H);
+  const all = [...D.curves.v01, ...D.curves.v02];
+  const x = d3.scaleLog(d3.extent(all, (p) => p.n), [m.l, W - m.r]);
+  const y = d3.scaleLog([d3.min(all, (p) => p.t) * 0.8, d3.max(all, (p) => p.t) * 1.25], [H - m.b, m.t]);
+  const ticksY = [0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20].filter((v) => v >= y.domain()[0] && v <= y.domain()[1]);
+  ticksY.forEach((v) => {
+    svg.append("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", y(v)).attr("y2", y(v)).attr("stroke", css("--grid"));
+    svg.append("text").attr("x", m.l - 8).attr("y", y(v)).attr("dy", "0.35em").attr("text-anchor", "end").text(fmt(v, v < 1 ? 2 : 0));
+  });
+  const ns = D.curves.v01.map((p) => p.n);
+  ns.forEach((n) => svg.append("text").attr("x", x(n)).attr("y", H - m.b + 18).attr("text-anchor", "middle").text(new Intl.NumberFormat(loc(), { notation: "compact" }).format(n)));
+  svg.append("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", H - m.b).attr("y2", H - m.b).attr("stroke", css("--line"));
+  svg.append("text").attr("x", W - m.r).attr("y", H - 2).attr("text-anchor", "end").text(t("xN"));
+  svg.append("text").attr("x", 0).attr("y", m.t - 2).text(t("yT")).attr("dy", "-0.2em");
+  const line = d3.line((p) => x(p.n), (p) => y(p.t));
+  const cross = svg.append("line").attr("y1", m.t).attr("y2", H - m.b).attr("stroke", css("--text-3")).attr("stroke-dasharray", "3 3").style("opacity", 0);
+  [["v01", "--s-old"], ["v02", "--s-new"]].forEach(([v, col]) => {
+    const pts = D.curves[v];
+    svg.append("path").attr("d", line(pts)).attr("fill", "none").attr("stroke", css(col)).attr("stroke-width", 2).attr("stroke-linecap", "round").attr("stroke-linejoin", "round");
+    svg.selectAll(null).data(pts).join("circle").attr("cx", (p) => x(p.n)).attr("cy", (p) => y(p.t)).attr("r", 4).attr("fill", css(col)).attr("stroke", css("--surface")).attr("stroke-width", 2);
+    const last = pts[pts.length - 1];
+    svg.append("text").attr("x", x(last.n) + 8).attr("y", y(last.t)).attr("dy", "0.35em").attr("class", "val-l").text(`${v === "v01" ? "v0.1" : "v0.2"} ${fmt(last.t, last.t < 1 ? 2 : 1)} s`);
+  });
+  svg.append("rect").attr("x", m.l).attr("y", m.t).attr("width", W - m.l - m.r).attr("height", H - m.t - m.b).attr("fill", "transparent")
+    .on("mousemove", (e) => {
+      const [px] = d3.pointer(e);
+      const n = ns.reduce((a, b) => (Math.abs(x(b) - px) < Math.abs(x(a) - px) ? b : a));
+      cross.attr("x1", x(n)).attr("x2", x(n)).style("opacity", 1);
+      const a = D.curves.v01.find((p) => p.n === n).t, b = D.curves.v02.find((p) => p.n === n).t;
+      showTip(e, `N = ${new Intl.NumberFormat(loc()).format(n)}`, [[css("--s-old"), "v0.1", `${fmt(a, 3)} s`], [css("--s-new"), "v0.2", `${fmt(b, 3)} s`], [null, "×", fmt(a / b, 1)]]);
+    })
+    .on("mouseleave", () => { cross.style("opacity", 0); hideTip(); });
+}
+
+function renderEffNums() {
+  const c1 = Object.fromEntries(D.curves.v01.map((p) => [p.n, p.t])), c2 = Object.fromEntries(D.curves.v02.map((p) => [p.n, p.t]));
+  const items = [[`${fmt(c1[20000])} → ${fmt(c2[20000])} s`, t("e_20")], [`${fmt(c1[40000], 1)} → ${fmt(c2[40000])} s`, t("e_40")],
+                 [`${fmt(IND["IE-04"].v01, 1)} → ${fmt(IND["IE-04"].v02, 1)}`, t("e_mem")]];
+  document.getElementById("effNums").innerHTML = items.map(([a, b]) => `<div class="bignum"><b>${a}</b><span>${b}</span></div>`).join("");
+}
+
+function renderHot() {
+  const W = width("chHot"), rowH = 22, headH = 22;
+  const groups = ["v01", "v02"];
+  const H = groups.reduce((s, v) => s + headH + D.hotspots[v].length * rowH + 6, 0);
+  const svg = svgIn("chHot", W, H);
+  const L = Math.min(230, W * 0.55), x = d3.scaleLinear([0, 100], [L, W - 46]);
+  let y = 0;
+  groups.forEach((v) => {
+    svg.append("text").attr("x", 0).attr("y", y + 14).attr("class", "val-l").text(t("series")[v]);
+    y += headH;
+    D.hotspots[v].forEach((h) => {
+      const lab = svg.append("text").attr("x", L - 8).attr("y", y + rowH / 2).attr("dy", "0.35em").attr("text-anchor", "end").style("font-family", "var(--mono)").style("font-size", "11px").text(h.fn);
+      while (lab.node().getComputedTextLength() > L - 12 && lab.text().length > 10) lab.text(lab.text().slice(0, -2) + "…");
+      svg.append("rect").attr("x", x(0)).attr("y", y + 5).attr("width", Math.max(3, x(h.pct) - x(0))).attr("height", rowH - 10).attr("rx", 4).attr("fill", css(v === "v01" ? "--s-old" : "--s-new"));
+      svg.append("text").attr("x", x(h.pct) + 6).attr("y", y + rowH / 2).attr("dy", "0.35em").attr("class", "val-l").text(`${fmt(h.pct, 1)}%`);
+      svg.append("rect").attr("x", 0).attr("y", y).attr("width", W).attr("height", rowH).attr("fill", "transparent")
+        .on("mousemove", (e) => showTip(e, h.fn, [[null, t("series")[v], `${fmt(h.pct, 1)}%`]])).on("mouseleave", hideTip);
+      y += rowH;
+    });
+    y += 6;
+  });
+}
+
+/* ---------- tables */
+function renderScore() {
+  const rows = D.indicators.filter((i) => state.group === "all" || i.group === state.group);
+  document.querySelector("#tblScore tbody").innerHTML = rows.map((i) => `<tr>
+    <td><span class="pill">${i.code}</span></td>
+    <td>${esc(i.name[state.lang])}<span class="sub">${esc(i.unit[state.lang] || "")}${i.unit[state.lang] ? " · " : ""}${t("better")[i.better]}</span></td>
+    <td class="hide-sm num">${i.better === "lower" ? "≤" : "≥"} ${fmtI(i.code, i.green)}</td>
+    <td class="n num">${fmtI(i.code, i.v01)}</td><td>${badge(i.s_v01)}</td>
+    <td class="n num">${fmtI(i.code, i.v02)}</td><td>${badge(i.s_v02)}</td></tr>`).join("");
+}
+
+function renderIssues() {
+  const q = state.q.trim().toLowerCase();
+  const rows = D.issues.filter((r) => (state.meas === "all" || r.measures.includes(state.meas))
+      && (!q || [r.id, r.module, r.cwe, r.name.en, r.name.es, r.tool, r.rule].join(" ").toLowerCase().includes(q)))
+    .sort((a, b) => {
+      const k = state.sort;
+      const av = k === "name" ? a.name[state.lang] : k === "measures" ? a.measures.join() : a[k];
+      const bv = k === "name" ? b.name[state.lang] : k === "measures" ? b.measures.join() : b[k];
+      return (av > bv ? 1 : av < bv ? -1 : 0) * state.dir;
+    });
+  document.querySelector("#tblIss tbody").innerHTML = rows.map((r) => `<tr>
+    <td class="mono">${r.id}</td><td class="mono">${esc(r.module)}</td><td class="n num">${r.line}</td>
+    <td><span class="pill">CWE-${r.cwe}</span></td><td>${esc(r.name[state.lang])}<span class="sub mono">${esc(r.rule)}</span></td>
+    <td class="hide-sm">${r.measures.map((m) => `<span class="pill">${m}</span>`).join(" ")}</td>
+    <td class="hide-sm">${esc(r.tool)}</td><td>${badge("good").replace(t("status").good, t("fixed"))}</td></tr>`).join("");
+  document.getElementById("issCount").textContent = t("showing")(rows.length, D.issues.length);
+  document.querySelectorAll("#tblIss th button").forEach((b) => b.closest("th").setAttribute("aria-sort", b.dataset.k === state.sort ? (state.dir > 0 ? "ascending" : "descending") : "none"));
+}
+
+function renderAll() {
+  applyText(); renderKpis(); renderTargets(); renderScore(); renderMeasures(); renderCwe(); renderCoverage();
+  renderScale(); renderEffNums(); renderHot(); renderIssues();
+}
+
+/* ---------- events */
+document.getElementById("langSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; state.lang = b.dataset.l; store.set("vs-lang", state.lang); renderAll(); });
+document.getElementById("verSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; state.ver = b.dataset.v; applyText(); renderKpis(); });
+document.getElementById("grpSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; state.group = b.dataset.g; applyText(); renderScore(); });
+document.getElementById("measSeg").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; state.meas = b.dataset.m; applyText(); renderIssues(); });
+document.getElementById("q").addEventListener("input", (e) => { state.q = e.target.value; renderIssues(); });
+document.querySelectorAll("#tblIss th button").forEach((b) => b.addEventListener("click", () => {
+  state.dir = state.sort === b.dataset.k ? -state.dir : 1; state.sort = b.dataset.k; renderIssues();
+}));
+document.getElementById("themeBtn").addEventListener("click", () => {
+  const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  document.documentElement.dataset.theme = cur === "dark" ? "light" : "dark";
+  store.set("vs-theme", document.documentElement.dataset.theme); renderAll();
+});
+const savedTheme = store.get("vs-theme"); if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderAll);
+let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(renderAll, 150); });
+const links = [...document.querySelectorAll("#nav a")];
+const obs = new IntersectionObserver((ents) => ents.forEach((en) => { if (en.isIntersecting) links.forEach((a) => a.classList.toggle("on", a.getAttribute("href") === `#${en.target.id}`)); }),
+  { root: null, rootMargin: "-40% 0px -55% 0px" });
+document.querySelectorAll("main section[id]").forEach((s) => obs.observe(s));
+renderAll();
+</script>
+</body>
+</html>
