@@ -1,0 +1,667 @@
+{
+  "version": "v0.1",
+  "herramientas": {
+    "radon": "6.0.1",
+    "pylint": "4.1.3",
+    "bandit": "1.9.4"
+  },
+  "tamano": {
+    "loc": 441,
+    "sloc": 332,
+    "lloc": 346,
+    "comentarios": 4,
+    "modulos": 10,
+    "funciones": 21,
+    "ksloc": 0.332
+  },
+  "conteos_5055": {
+    "ASCMM": 6,
+    "ASCPEM": 22,
+    "ASCRM": 20,
+    "ASCSM": 16
+  },
+  "densidades_5055": {
+    "ASCMM": 18.07,
+    "ASCPEM": 66.27,
+    "ASCRM": 60.24,
+    "ASCSM": 48.19
+  },
+  "complejidad": {
+    "promedio": 3.81,
+    "maxima": 21,
+    "funciones_sobre_limite": 1,
+    "porcentaje_sobre_limite": 4.76,
+    "top": [
+      {
+        "modulo": "vigisalud.validacion",
+        "funcion": "validar_notificacion",
+        "linea": 17,
+        "cc": 21
+      },
+      {
+        "modulo": "vigisalud.indicadores",
+        "funcion": "distribuir_por_edad",
+        "linea": 43,
+        "cc": 7
+      },
+      {
+        "modulo": "vigisalud.alertas",
+        "funcion": "calcular_canal_endemico",
+        "linea": 25,
+        "cc": 5
+      },
+      {
+        "modulo": "vigisalud.indicadores",
+        "funcion": "calcular_incidencia",
+        "linea": 6,
+        "cc": 5
+      },
+      {
+        "modulo": "vigisalud.indicadores",
+        "funcion": "calcular_letalidad",
+        "linea": 27,
+        "cc": 5
+      }
+    ]
+  },
+  "mantenibilidad_mi": {
+    "promedio_ponderado": 60.61,
+    "por_modulo": {
+      "vigisalud.__init__": {
+        "mi": 100.0,
+        "sloc": 1
+      },
+      "vigisalud.alertas": {
+        "mi": 49.58,
+        "sloc": 48
+      },
+      "vigisalud.config": {
+        "mi": 100.0,
+        "sloc": 11
+      },
+      "vigisalud.datos": {
+        "mi": 75.28,
+        "sloc": 30
+      },
+      "vigisalud.indicadores": {
+        "mi": 42.37,
+        "sloc": 49
+      },
+      "vigisalud.modelos": {
+        "mi": 100.0,
+        "sloc": 23
+      },
+      "vigisalud.pipeline": {
+        "mi": 66.61,
+        "sloc": 19
+      },
+      "vigisalud.reportes": {
+        "mi": 59.16,
+        "sloc": 41
+      },
+      "vigisalud.repositorio": {
+        "mi": 100.0,
+        "sloc": 33
+      },
+      "vigisalud.validacion": {
+        "mi": 37.87,
+        "sloc": 77
+      }
+    }
+  },
+  "duplicacion": {
+    "lineas": 13,
+    "porcentaje": 3.92
+  },
+  "hallazgos": [
+    {
+      "modulo": "vigisalud.alertas",
+      "linea": 31,
+      "cwe": 1060,
+      "debilidad": "CWE-1060",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "query-in-loop",
+      "mensaje": "Consulta repositorio.contar_casos_por_anio dentro de un bucle"
+    },
+    {
+      "modulo": "vigisalud.alertas",
+      "linea": 61,
+      "cwe": 772,
+      "debilidad": "Recurso no liberado tras su vida util",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'servidor' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.alertas",
+      "linea": 61,
+      "cwe": 1088,
+      "debilidad": "Acceso sincrono a recurso remoto sin tiempo limite",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "remote-no-timeout",
+      "mensaje": "Conexion remota sin tiempo limite"
+    },
+    {
+      "modulo": "vigisalud.config",
+      "linea": 5,
+      "cwe": 1051,
+      "debilidad": "Configuracion de red codificada en el fuente",
+      "medidas": [
+        "ASCMM",
+        "ASCRM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "hardcoded-network",
+      "mensaje": "Direccion de red fija 'smtp.vigisalud-areq.org'"
+    },
+    {
+      "modulo": "vigisalud.config",
+      "linea": 8,
+      "cwe": 798,
+      "debilidad": "Credenciales codificadas en el fuente",
+      "medidas": [
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "hardcoded-credential",
+      "mensaje": "Credencial escrita en el codigo fuente"
+    },
+    {
+      "modulo": "vigisalud.datos",
+      "linea": 22,
+      "cwe": 775,
+      "debilidad": "Descriptor de archivo no liberado",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'archivo' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.datos",
+      "linea": 32,
+      "cwe": 1067,
+      "debilidad": "Busquedas secuenciales excesivas",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "linear-search",
+      "mensaje": "Busqueda lineal por igualdad sobre una coleccion"
+    },
+    {
+      "modulo": "vigisalud.indicadores",
+      "linea": 21,
+      "cwe": 369,
+      "debilidad": "Division por cero",
+      "medidas": [
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "unchecked-division",
+      "mensaje": "Division entre 'poblaciones[clave]' sin control de cero"
+    },
+    {
+      "modulo": "vigisalud.indicadores",
+      "linea": 39,
+      "cwe": 369,
+      "debilidad": "Division por cero",
+      "medidas": [
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "unchecked-division",
+      "mensaje": "Division entre 'casos[enfermedad]' sin control de cero"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 8,
+      "cwe": 1041,
+      "debilidad": "Codigo redundante (copiar y pegar)",
+      "medidas": [
+        "ASCMM"
+      ],
+      "herramienta": "Pylint",
+      "regla": "R0801 duplicate-code",
+      "mensaje": "Similar lines in 2 files"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 21,
+      "cwe": 772,
+      "debilidad": "Recurso no liberado tras su vida util",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'conexion' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 21,
+      "cwe": 1072,
+      "debilidad": "Acceso a datos sin reutilizacion de conexiones (pool)",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "no-connection-reuse",
+      "mensaje": "Conexion nueva por operacion (5 puntos de conexion en el codigo)"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 22,
+      "cwe": 1057,
+      "debilidad": "Acceso a datos fuera del componente gestor de datos",
+      "medidas": [
+        "ASCPEM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "data-access-outside-dal",
+      "mensaje": "SQL ejecutado fuera de repositorio"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 23,
+      "cwe": 89,
+      "debilidad": "Inyeccion SQL",
+      "medidas": [
+        "ASCSM"
+      ],
+      "herramienta": "Bandit",
+      "regla": "B608 hardcoded_sql_expressions",
+      "mensaje": "Possible SQL injection vector through string-based query construction."
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 33,
+      "cwe": 1046,
+      "debilidad": "Texto inmutable creado por concatenacion",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "str-concat-loop",
+      "mensaje": "Texto concatenado con += dentro de un bucle"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 36,
+      "cwe": 1046,
+      "debilidad": "Texto inmutable creado por concatenacion",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "str-concat-loop",
+      "mensaje": "Texto concatenado con += dentro de un bucle"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 41,
+      "cwe": 1046,
+      "debilidad": "Texto inmutable creado por concatenacion",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "str-concat-loop",
+      "mensaje": "Texto concatenado con += dentro de un bucle"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 46,
+      "cwe": 1046,
+      "debilidad": "Texto inmutable creado por concatenacion",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "str-concat-loop",
+      "mensaje": "Texto concatenado con += dentro de un bucle"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 49,
+      "cwe": 1085,
+      "debilidad": "Volumen excesivo de codigo comentado",
+      "medidas": [
+        "ASCMM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "commented-out-code",
+      "mensaje": "3 lineas de codigo comentado"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 52,
+      "cwe": 775,
+      "debilidad": "Descriptor de archivo no liberado",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'archivo' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 55,
+      "cwe": 561,
+      "debilidad": "Codigo muerto",
+      "medidas": [
+        "ASCMM"
+      ],
+      "herramienta": "Pylint",
+      "regla": "W0101 unreachable",
+      "mensaje": "Unreachable code"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 8,
+      "cwe": 772,
+      "debilidad": "Recurso no liberado tras su vida util",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'conexion' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 8,
+      "cwe": 1072,
+      "debilidad": "Acceso a datos sin reutilizacion de conexiones (pool)",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "no-connection-reuse",
+      "mensaje": "Conexion nueva por operacion (5 puntos de conexion en el codigo)"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 20,
+      "cwe": 772,
+      "debilidad": "Recurso no liberado tras su vida util",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'conexion' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 20,
+      "cwe": 1072,
+      "debilidad": "Acceso a datos sin reutilizacion de conexiones (pool)",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "no-connection-reuse",
+      "mensaje": "Conexion nueva por operacion (5 puntos de conexion en el codigo)"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 22,
+      "cwe": 1050,
+      "debilidad": "Consumo excesivo de recursos de plataforma dentro de un bucle",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-in-loop",
+      "mensaje": "Llamada 'execute' dentro de un bucle"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 23,
+      "cwe": 89,
+      "debilidad": "Inyeccion SQL",
+      "medidas": [
+        "ASCSM"
+      ],
+      "herramienta": "Bandit",
+      "regla": "B608 hardcoded_sql_expressions",
+      "mensaje": "Possible SQL injection vector through string-based query construction."
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 32,
+      "cwe": 772,
+      "debilidad": "Recurso no liberado tras su vida util",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'conexion' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 32,
+      "cwe": 1072,
+      "debilidad": "Acceso a datos sin reutilizacion de conexiones (pool)",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "no-connection-reuse",
+      "mensaje": "Conexion nueva por operacion (5 puntos de conexion en el codigo)"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 34,
+      "cwe": 89,
+      "debilidad": "Inyeccion SQL",
+      "medidas": [
+        "ASCSM"
+      ],
+      "herramienta": "Bandit",
+      "regla": "B608 hardcoded_sql_expressions",
+      "mensaje": "Possible SQL injection vector through string-based query construction."
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 45,
+      "cwe": 772,
+      "debilidad": "Recurso no liberado tras su vida util",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'conexion' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 45,
+      "cwe": 1072,
+      "debilidad": "Acceso a datos sin reutilizacion de conexiones (pool)",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "no-connection-reuse",
+      "mensaje": "Conexion nueva por operacion (5 puntos de conexion en el codigo)"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 46,
+      "cwe": 89,
+      "debilidad": "Inyeccion SQL",
+      "medidas": [
+        "ASCSM"
+      ],
+      "herramienta": "Bandit",
+      "regla": "B608 hardcoded_sql_expressions",
+      "mensaje": "Possible SQL injection vector through string-based query construction."
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 10,
+      "cwe": 1064,
+      "debilidad": "Firma con numero excesivo de parametros",
+      "medidas": [
+        "ASCMM"
+      ],
+      "herramienta": "Pylint + Pylint",
+      "regla": "R0913 too-many-arguments",
+      "mensaje": "Too many arguments (11/7)"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 17,
+      "cwe": 1121,
+      "debilidad": "Complejidad ciclomatica de McCabe excesiva",
+      "medidas": [
+        "ASCMM"
+      ],
+      "herramienta": "Radon",
+      "regla": "cc>10",
+      "mensaje": "validar_notificacion: CC = 21"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 35,
+      "cwe": 390,
+      "debilidad": "Condicion de error detectada sin accion",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "except-pass",
+      "mensaje": "Excepcion capturada sin ninguna accion"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 35,
+      "cwe": 703,
+      "debilidad": "Manejo incorrecto de condiciones excepcionales",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Pylint + Bandit",
+      "regla": "W0702 bare-except",
+      "mensaje": "No exception type(s) specified"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 42,
+      "cwe": 390,
+      "debilidad": "Condicion de error detectada sin accion",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "except-pass",
+      "mensaje": "Excepcion capturada sin ninguna accion"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 42,
+      "cwe": 703,
+      "debilidad": "Manejo incorrecto de condiciones excepcionales",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Pylint + Bandit",
+      "regla": "W0702 bare-except",
+      "mensaje": "No exception type(s) specified"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 49,
+      "cwe": 390,
+      "debilidad": "Condicion de error detectada sin accion",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "except-pass",
+      "mensaje": "Excepcion capturada sin ninguna accion"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 49,
+      "cwe": 703,
+      "debilidad": "Manejo incorrecto de condiciones excepcionales",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Pylint + Bandit",
+      "regla": "W0702 bare-except",
+      "mensaje": "No exception type(s) specified"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 56,
+      "cwe": 390,
+      "debilidad": "Condicion de error detectada sin accion",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "except-pass",
+      "mensaje": "Excepcion capturada sin ninguna accion"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 56,
+      "cwe": 703,
+      "debilidad": "Manejo incorrecto de condiciones excepcionales",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Pylint + Bandit",
+      "regla": "W0702 bare-except",
+      "mensaje": "No exception type(s) specified"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 80,
+      "cwe": 1067,
+      "debilidad": "Busquedas secuenciales excesivas",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "list-membership-loop",
+      "mensaje": "Busqueda 'in' sobre la lista 'ids_vistos' dentro de un bucle"
+    }
+  ],
+  "bandit_fuera_de_norma": []
+}

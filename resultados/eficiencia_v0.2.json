@@ -1,0 +1,109 @@
+{
+  "version": "v0.2",
+  "entorno": {
+    "python": "3.12.8",
+    "sistema": "Windows-11-10.0.26200-SP0",
+    "procesador": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel"
+  },
+  "n_referencia": 20000,
+  "tiempo_s": 0.1847,
+  "throughput": 108283.7,
+  "memoria_pico_mb": 24.61,
+  "exponente_escalabilidad": 0.735,
+  "hotspot": [
+    {
+      "funcion": "validacion.py:53(validar_notificacion)",
+      "tiempo_propio_s": 0.054,
+      "porcentaje": 21.0
+    },
+    {
+      "funcion": "~:0(<method 'executemany' of 'sqlite3.Connection' objects>)",
+      "tiempo_propio_s": 0.0473,
+      "porcentaje": 18.4
+    },
+    {
+      "funcion": "csv.py:112(__next__)",
+      "tiempo_propio_s": 0.0271,
+      "porcentaje": 10.5
+    },
+    {
+      "funcion": "~:0(<built-in method builtins.next>)",
+      "tiempo_propio_s": 0.0187,
+      "porcentaje": 7.3
+    },
+    {
+      "funcion": "~:0(<method 'executescript' of 'sqlite3.Connection' objects>)",
+      "tiempo_propio_s": 0.015,
+      "porcentaje": 5.8
+    }
+  ],
+  "hotspot_pct": 21.0,
+  "corridas_con_bd_bloqueada": "0/17",
+  "curva": [
+    {
+      "n": 2500,
+      "mediana_s": 0.046,
+      "tiempos_s": [
+        0.0513,
+        0.046,
+        0.0432
+      ]
+    },
+    {
+      "n": 5000,
+      "mediana_s": 0.0638,
+      "tiempos_s": [
+        0.0724,
+        0.0635,
+        0.0638
+      ]
+    },
+    {
+      "n": 10000,
+      "mediana_s": 0.1029,
+      "tiempos_s": [
+        0.1085,
+        0.1029,
+        0.101
+      ]
+    },
+    {
+      "n": 20000,
+      "mediana_s": 0.1847,
+      "tiempos_s": [
+        0.1885,
+        0.1847,
+        0.1894,
+        0.1785,
+        0.1826
+      ]
+    },
+    {
+      "n": 40000,
+      "mediana_s": 0.3453,
+      "tiempos_s": [
+        0.3544,
+        0.3448,
+        0.3453
+      ]
+    }
+  ],
+  "resumen_funcional": {
+    "leidas": 20200,
+    "validas": 19610,
+    "rechazadas": 590,
+    "alertas": 95,
+    "letalidad": {
+      "IRA": 0.67,
+      "DENGUE": 1.21,
+      "EDA": 0.68
+    },
+    "edades": {
+      "NINO (0-11)": 225,
+      "ADOLESCENTE (12-17)": 104,
+      "JOVEN (18-29)": 228,
+      "ADULTO (30-59)": 558,
+      "ADULTO MAYOR (60+)": 647
+    }
+  }
+}

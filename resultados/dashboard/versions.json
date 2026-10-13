@@ -1,0 +1,18 @@
+[
+ {
+  "version": "v0.1",
+  "sloc": 332,
+  "functions": 21,
+  "modules": 10,
+  "weaknesses": 44,
+  "db_locked_runs": "17/17"
+ },
+ {
+  "version": "v0.2",
+  "sloc": 269,
+  "functions": 32,
+  "modules": 11,
+  "weaknesses": 0,
+  "db_locked_runs": "0/17"
+ }
+]

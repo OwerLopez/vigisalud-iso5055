@@ -1,0 +1,109 @@
+{
+  "version": "v0.1",
+  "entorno": {
+    "python": "3.12.8",
+    "sistema": "Windows-11-10.0.26200-SP0",
+    "procesador": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel"
+  },
+  "n_referencia": 20000,
+  "tiempo_s": 3.9399,
+  "throughput": 5076.3,
+  "memoria_pico_mb": 22.68,
+  "exponente_escalabilidad": 1.326,
+  "hotspot": [
+    {
+      "funcion": "~:0(<method 'execute' of 'sqlite3.Connection' objects>)",
+      "tiempo_propio_s": 2.1133,
+      "porcentaje": 51.6
+    },
+    {
+      "funcion": "validacion.py:73(validar_lote)",
+      "tiempo_propio_s": 1.4183,
+      "porcentaje": 34.6
+    },
+    {
+      "funcion": "~:0(<built-in method _sqlite3.connect>)",
+      "tiempo_propio_s": 0.1886,
+      "porcentaje": 4.6
+    },
+    {
+      "funcion": "functools.py:479(lru_cache)",
+      "tiempo_propio_s": 0.0746,
+      "porcentaje": 1.8
+    },
+    {
+      "funcion": "functools.py:35(update_wrapper)",
+      "tiempo_propio_s": 0.071,
+      "porcentaje": 1.7
+    }
+  ],
+  "hotspot_pct": 51.6,
+  "corridas_con_bd_bloqueada": "17/17",
+  "curva": [
+    {
+      "n": 2500,
+      "mediana_s": 0.4616,
+      "tiempos_s": [
+        0.468,
+        0.4596,
+        0.4616
+      ]
+    },
+    {
+      "n": 5000,
+      "mediana_s": 0.7507,
+      "tiempos_s": [
+        0.7651,
+        0.7507,
+        0.7498
+      ]
+    },
+    {
+      "n": 10000,
+      "mediana_s": 1.4719,
+      "tiempos_s": [
+        1.4809,
+        1.4198,
+        1.4719
+      ]
+    },
+    {
+      "n": 20000,
+      "mediana_s": 3.9399,
+      "tiempos_s": [
+        3.9399,
+        3.9185,
+        3.9806,
+        4.3021,
+        3.9281
+      ]
+    },
+    {
+      "n": 40000,
+      "mediana_s": 19.9341,
+      "tiempos_s": [
+        17.489,
+        20.1069,
+        19.9341
+      ]
+    }
+  ],
+  "resumen_funcional": {
+    "leidas": 20200,
+    "validas": 19610,
+    "rechazadas": 590,
+    "alertas": 95,
+    "letalidad": {
+      "IRA": 0.67,
+      "DENGUE": 1.21,
+      "EDA": 0.68
+    },
+    "edades": {
+      "NINO (0-11)": 225,
+      "ADOLESCENTE (12-17)": 104,
+      "JOVEN (18-29)": 228,
+      "ADULTO (30-59)": 558,
+      "ADULTO MAYOR (60+)": 647
+    }
+  }
+}

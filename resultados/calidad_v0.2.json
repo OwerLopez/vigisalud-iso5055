@@ -1,0 +1,122 @@
+{
+  "version": "v0.2",
+  "herramientas": {
+    "radon": "6.0.1",
+    "pylint": "4.1.3",
+    "bandit": "1.9.4"
+  },
+  "tamano": {
+    "loc": 395,
+    "sloc": 269,
+    "lloc": 274,
+    "comentarios": 1,
+    "modulos": 11,
+    "funciones": 32,
+    "ksloc": 0.269
+  },
+  "conteos_5055": {
+    "ASCMM": 0,
+    "ASCPEM": 0,
+    "ASCRM": 0,
+    "ASCSM": 0
+  },
+  "densidades_5055": {
+    "ASCMM": 0.0,
+    "ASCPEM": 0.0,
+    "ASCRM": 0.0,
+    "ASCSM": 0.0
+  },
+  "complejidad": {
+    "promedio": 2.53,
+    "maxima": 7,
+    "funciones_sobre_limite": 0,
+    "porcentaje_sobre_limite": 0.0,
+    "top": [
+      {
+        "modulo": "vigisalud.validacion",
+        "funcion": "validar_notificacion",
+        "linea": 53,
+        "cc": 7
+      },
+      {
+        "modulo": "vigisalud.indicadores",
+        "funcion": "calcular_letalidad",
+        "linea": 30,
+        "cc": 6
+      },
+      {
+        "modulo": "vigisalud.alertas",
+        "funcion": "calcular_canal_endemico",
+        "linea": 13,
+        "cc": 5
+      },
+      {
+        "modulo": "vigisalud.reportes",
+        "funcion": "generar_reporte_html",
+        "linea": 12,
+        "cc": 5
+      },
+      {
+        "modulo": "vigisalud.indicadores",
+        "funcion": "calcular_incidencia",
+        "linea": 18,
+        "cc": 4
+      }
+    ]
+  },
+  "mantenibilidad_mi": {
+    "promedio_ponderado": 65.88,
+    "por_modulo": {
+      "vigisalud.__init__": {
+        "mi": 100.0,
+        "sloc": 1
+      },
+      "vigisalud.alertas": {
+        "mi": 57.31,
+        "sloc": 35
+      },
+      "vigisalud.canal": {
+        "mi": 72.44,
+        "sloc": 6
+      },
+      "vigisalud.config": {
+        "mi": 100.0,
+        "sloc": 13
+      },
+      "vigisalud.datos": {
+        "mi": 100.0,
+        "sloc": 17
+      },
+      "vigisalud.indicadores": {
+        "mi": 51.77,
+        "sloc": 28
+      },
+      "vigisalud.modelos": {
+        "mi": 100.0,
+        "sloc": 23
+      },
+      "vigisalud.pipeline": {
+        "mi": 65.71,
+        "sloc": 22
+      },
+      "vigisalud.reportes": {
+        "mi": 58.37,
+        "sloc": 22
+      },
+      "vigisalud.repositorio": {
+        "mi": 73.82,
+        "sloc": 42
+      },
+      "vigisalud.validacion": {
+        "mi": 43.36,
+        "sloc": 60
+      }
+    }
+  },
+  "duplicacion": {
+    "lineas": 0,
+    "porcentaje": 0.0
+  },
+  "hallazgos": [],
+  "bandit_fuera_de_norma": []
+}

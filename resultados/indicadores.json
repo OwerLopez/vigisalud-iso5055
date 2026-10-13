@@ -1,0 +1,1297 @@
+{
+  "proyecto": "VigiSalud Arequipa",
+  "fecha_medicion": "2026-10-12",
+  "herramientas": {
+    "radon": "6.0.1",
+    "pylint": "4.1.3",
+    "bandit": "1.9.4"
+  },
+  "entorno": {
+    "python": "3.12.8",
+    "sistema": "Windows-11-10.0.26200-SP0",
+    "procesador": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel"
+  },
+  "tamano": {
+    "v0.1": {
+      "loc": 441,
+      "sloc": 332,
+      "lloc": 346,
+      "comentarios": 4,
+      "modulos": 10,
+      "funciones": 21,
+      "ksloc": 0.332
+    },
+    "v0.2": {
+      "loc": 395,
+      "sloc": 269,
+      "lloc": 274,
+      "comentarios": 1,
+      "modulos": 11,
+      "funciones": 32,
+      "ksloc": 0.269
+    }
+  },
+  "conteos_5055": {
+    "v0.1": {
+      "ASCMM": 6,
+      "ASCPEM": 22,
+      "ASCRM": 20,
+      "ASCSM": 16
+    },
+    "v0.2": {
+      "ASCMM": 0,
+      "ASCPEM": 0,
+      "ASCRM": 0,
+      "ASCSM": 0
+    }
+  },
+  "indicadores": [
+    {
+      "codigo": "IC-01",
+      "grupo": "Calidad",
+      "nombre": "Densidad de debilidades de mantenibilidad",
+      "caracteristica": "Mantenibilidad (ISO/IEC 25010)",
+      "medida_5055": "ASCMM",
+      "cwe": "29 CWE de la cláusula 7.1 (p. ej. 561, 1041, 1064, 1085, 1121)",
+      "pregunta": "¿Cuántas debilidades graves de mantenibilidad hay por cada mil líneas?",
+      "medidas_base": "Ocurrencias de CWE de mantenibilidad; SLOC",
+      "formula": "IC-01 = (suma de ocurrencias CWE de mantenibilidad / SLOC) × 1000",
+      "unidad": "debilidades/KSLOC",
+      "escala": "Razón (0 a infinito)",
+      "herramienta": "Pylint + Radon + detectores AST",
+      "momento": "Revisión individual (6.4.3)",
+      "sentido": "menor es mejor",
+      "verde": 2.0,
+      "ambar": 5.0,
+      "interpretacion": "Valores altos anticipan mayor costo y riesgo al modificar el código.",
+      "responsable": "Líder técnico",
+      "v0.1": 18.07,
+      "semaforo_v0.1": "ROJO",
+      "v0.2": 0.0,
+      "semaforo_v0.2": "VERDE"
+    },
+    {
+      "codigo": "IC-02",
+      "grupo": "Calidad",
+      "nombre": "Densidad de debilidades de fiabilidad",
+      "caracteristica": "Fiabilidad (ISO/IEC 25010)",
+      "medida_5055": "ASCRM",
+      "cwe": "74 CWE de la cláusula 7.3 (p. ej. 369, 390, 703, 772, 1088)",
+      "pregunta": "¿Cuántas debilidades que pueden provocar fallas o caídas hay por KSLOC?",
+      "medidas_base": "Ocurrencias de CWE de fiabilidad; SLOC",
+      "formula": "IC-02 = (suma de ocurrencias CWE de fiabilidad / SLOC) × 1000",
+      "unidad": "debilidades/KSLOC",
+      "escala": "Razón (0 a infinito)",
+      "herramienta": "Pylint + Bandit + detectores AST",
+      "momento": "Revisión individual (6.4.3)",
+      "sentido": "menor es mejor",
+      "verde": 1.0,
+      "ambar": 3.0,
+      "interpretacion": "Un sistema de alertas sanitarias no debe fallar en silencio; se espera un valor cercano a 0.",
+      "responsable": "Líder técnico",
+      "v0.1": 60.24,
+      "semaforo_v0.1": "ROJO",
+      "v0.2": 0.0,
+      "semaforo_v0.2": "VERDE"
+    },
+    {
+      "codigo": "IC-03",
+      "grupo": "Calidad",
+      "nombre": "Densidad de debilidades de seguridad",
+      "caracteristica": "Seguridad (ISO/IEC 25010)",
+      "medida_5055": "ASCSM",
+      "cwe": "73 CWE de la cláusula 7.4 (p. ej. 89, 259, 798, 772, 1057)",
+      "pregunta": "¿Cuántas debilidades explotables hay por KSLOC en un sistema que guarda datos de salud?",
+      "medidas_base": "Ocurrencias de CWE de seguridad; SLOC",
+      "formula": "IC-03 = (suma de ocurrencias CWE de seguridad / SLOC) × 1000",
+      "unidad": "debilidades/KSLOC",
+      "escala": "Razón (0 a infinito)",
+      "herramienta": "Bandit + detectores AST",
+      "momento": "Revisión individual (6.4.3)",
+      "sentido": "menor es mejor",
+      "verde": 0.0,
+      "ambar": 2.0,
+      "interpretacion": "Por tratarse de datos personales de salud (Ley 29733), la meta es 0.",
+      "responsable": "Responsable de seguridad",
+      "v0.1": 48.19,
+      "semaforo_v0.1": "ROJO",
+      "v0.2": 0.0,
+      "semaforo_v0.2": "VERDE"
+    },
+    {
+      "codigo": "IC-04",
+      "grupo": "Calidad",
+      "nombre": "Funciones con complejidad excesiva",
+      "caracteristica": "Mantenibilidad: analizabilidad y capacidad de prueba",
+      "medida_5055": "ASCMM",
+      "cwe": "CWE-1121",
+      "pregunta": "¿Qué proporción de funciones supera la complejidad ciclomática de 10?",
+      "medidas_base": "Complejidad ciclomática (CC) por función; número de funciones",
+      "formula": "IC-04 = (funciones con CC > 10 / total de funciones) × 100",
+      "unidad": "%",
+      "escala": "Razón (0 a 100)",
+      "herramienta": "Radon (cc)",
+      "momento": "Revisión individual (6.4.3)",
+      "sentido": "menor es mejor",
+      "verde": 5.0,
+      "ambar": 10.0,
+      "interpretacion": "Cada función sobre el límite necesita más casos de prueba y es difícil de revisar.",
+      "responsable": "Desarrollador autor",
+      "v0.1": 4.76,
+      "semaforo_v0.1": "VERDE",
+      "v0.2": 0.0,
+      "semaforo_v0.2": "VERDE"
+    },
+    {
+      "codigo": "IC-05",
+      "grupo": "Calidad",
+      "nombre": "Índice de mantenibilidad",
+      "caracteristica": "Mantenibilidad: modificabilidad",
+      "medida_5055": "Complementario",
+      "cwe": "No aplica (combina Halstead, CC y SLOC)",
+      "pregunta": "¿Qué tan fácil es entender y modificar cada módulo?",
+      "medidas_base": "Volumen de Halstead, CC, SLOC y comentarios por módulo",
+      "formula": "MI = max(0, (171 - 5.2 ln V - 0.23 CC - 16.2 ln SLOC) × 100 / 171), promedio ponderado por SLOC",
+      "unidad": "puntos (0-100)",
+      "escala": "Intervalo (0 a 100)",
+      "herramienta": "Radon (mi)",
+      "momento": "Análisis de hallazgos (6.4.4)",
+      "sentido": "mayor es mejor",
+      "verde": 50.0,
+      "ambar": 38.0,
+      "interpretacion": "Sobre 50 la mantenibilidad es alta; bajo 38, el módulo es candidato a reestructurarse.",
+      "responsable": "Líder técnico",
+      "v0.1": 60.61,
+      "semaforo_v0.1": "VERDE",
+      "v0.2": 65.88,
+      "semaforo_v0.2": "VERDE"
+    },
+    {
+      "codigo": "IC-06",
+      "grupo": "Calidad",
+      "nombre": "Código duplicado",
+      "caracteristica": "Mantenibilidad: reusabilidad",
+      "medida_5055": "ASCMM",
+      "cwe": "CWE-1041",
+      "pregunta": "¿Qué porcentaje del código está copiado y pegado?",
+      "medidas_base": "Líneas en bloques duplicados (6 o más líneas); SLOC",
+      "formula": "IC-06 = (líneas duplicadas / SLOC) × 100",
+      "unidad": "%",
+      "escala": "Razón (0 a 100)",
+      "herramienta": "Pylint (duplicate-code)",
+      "momento": "Revisión individual (6.4.3)",
+      "sentido": "menor es mejor",
+      "verde": 3.0,
+      "ambar": 5.0,
+      "interpretacion": "La duplicación obliga a corregir el mismo error en varios lugares.",
+      "responsable": "Desarrollador autor",
+      "v0.1": 3.92,
+      "semaforo_v0.1": "AMBAR",
+      "v0.2": 0.0,
+      "semaforo_v0.2": "VERDE"
+    },
+    {
+      "codigo": "IE-01",
+      "grupo": "Eficiencia",
+      "nombre": "Densidad de debilidades de eficiencia",
+      "caracteristica": "Eficiencia de desempeño (ISO/IEC 25010)",
+      "medida_5055": "ASCPEM",
+      "cwe": "18 CWE de la cláusula 7.2 (p. ej. 772, 775, 1046, 1050, 1057, 1060, 1067, 1072)",
+      "pregunta": "¿Cuántos patrones de código que desperdician tiempo o recursos hay por KSLOC?",
+      "medidas_base": "Ocurrencias de CWE de eficiencia; SLOC",
+      "formula": "IE-01 = (suma de ocurrencias CWE de eficiencia / SLOC) × 1000",
+      "unidad": "debilidades/KSLOC",
+      "escala": "Razón (0 a infinito)",
+      "herramienta": "Detectores AST + Pylint",
+      "momento": "Revisión individual (6.4.3)",
+      "sentido": "menor es mejor",
+      "verde": 1.0,
+      "ambar": 3.0,
+      "interpretacion": "Es la causa estática; IE-02 a IE-05 muestran su efecto medido en ejecución.",
+      "responsable": "Líder técnico",
+      "v0.1": 66.27,
+      "semaforo_v0.1": "ROJO",
+      "v0.2": 0.0,
+      "semaforo_v0.2": "VERDE"
+    },
+    {
+      "codigo": "IE-02",
+      "grupo": "Eficiencia",
+      "nombre": "Tiempo de procesamiento semanal",
+      "caracteristica": "Eficiencia: comportamiento temporal",
+      "medida_5055": "Medida dinámica (ISO/IEC 25023)",
+      "cwe": "Efecto de CWE-1050, 1060, 1067",
+      "pregunta": "¿Cuánto tarda el sistema en procesar la carga de referencia?",
+      "medidas_base": "Tiempo de reloj de 5 ejecuciones con N = 20 000 notificaciones",
+      "formula": "IE-02 = mediana(t1..t5)",
+      "unidad": "segundos",
+      "escala": "Razón",
+      "herramienta": "time.perf_counter",
+      "momento": "Revisión individual (6.4.3)",
+      "sentido": "menor es mejor",
+      "verde": 2.0,
+      "ambar": 5.0,
+      "interpretacion": "El requisito no funcional fija 2 s para emitir el reporte y las alertas de la semana.",
+      "responsable": "Tester de desempeño",
+      "v0.1": 3.9399,
+      "semaforo_v0.1": "AMBAR",
+      "v0.2": 0.1847,
+      "semaforo_v0.2": "VERDE"
+    },
+    {
+      "codigo": "IE-03",
+      "grupo": "Eficiencia",
+      "nombre": "Rendimiento (throughput)",
+      "caracteristica": "Eficiencia: capacidad",
+      "medida_5055": "Medida dinámica (ISO/IEC 25023)",
+      "cwe": "No aplica",
+      "pregunta": "¿Cuántas notificaciones procesa el sistema por segundo?",
+      "medidas_base": "N procesadas; tiempo IE-02",
+      "formula": "IE-03 = N / IE-02",
+      "unidad": "notificaciones/s",
+      "escala": "Razón",
+      "herramienta": "time.perf_counter",
+      "momento": "Revisión individual (6.4.3)",
+      "sentido": "mayor es mejor",
+      "verde": 10000.0,
+      "ambar": 4000.0,
+      "interpretacion": "Permite dimensionar picos de notificación durante un brote.",
+      "responsable": "Tester de desempeño",
+      "v0.1": 5076.3,
+      "semaforo_v0.1": "AMBAR",
+      "v0.2": 108283.7,
+      "semaforo_v0.2": "VERDE"
+    },
+    {
+      "codigo": "IE-04",
+      "grupo": "Eficiencia",
+      "nombre": "Memoria pico",
+      "caracteristica": "Eficiencia: utilización de recursos",
+      "medida_5055": "Medida dinámica (ISO/IEC 25023)",
+      "cwe": "Efecto de CWE-401, 772, 775",
+      "pregunta": "¿Cuánta memoria necesita el procesamiento de la carga de referencia?",
+      "medidas_base": "Pico de memoria asignada con N = 20 000",
+      "formula": "IE-04 = pico de tracemalloc / 1 048 576",
+      "unidad": "MB",
+      "escala": "Razón",
+      "herramienta": "tracemalloc",
+      "momento": "Revisión individual (6.4.3)",
+      "sentido": "menor es mejor",
+      "verde": 50.0,
+      "ambar": 100.0,
+      "interpretacion": "Los servidores del primer nivel de atención tienen poca memoria disponible.",
+      "responsable": "Tester de desempeño",
+      "v0.1": 22.68,
+      "semaforo_v0.1": "VERDE",
+      "v0.2": 24.61,
+      "semaforo_v0.2": "VERDE"
+    },
+    {
+      "codigo": "IE-05",
+      "grupo": "Eficiencia",
+      "nombre": "Exponente de escalabilidad",
+      "caracteristica": "Eficiencia: capacidad",
+      "medida_5055": "Relacionado con CWE-407",
+      "cwe": "CWE-407 (complejidad algorítmica)",
+      "pregunta": "¿Cómo crece el tiempo cuando crece el volumen de notificaciones?",
+      "medidas_base": "Tiempos con N = 2 500, 5 000, 10 000, 20 000 y 40 000",
+      "formula": "b en t = a × N^b (regresión lineal de log t contra log N)",
+      "unidad": "adimensional",
+      "escala": "Razón",
+      "herramienta": "Script de benchmark",
+      "momento": "Análisis de hallazgos (6.4.4)",
+      "sentido": "menor es mejor",
+      "verde": 1.2,
+      "ambar": 1.5,
+      "interpretacion": "b cercano a 1 es crecimiento lineal; b cercano a 2 indica un costo cuadrático.",
+      "responsable": "Tester de desempeño",
+      "v0.1": 1.326,
+      "semaforo_v0.1": "AMBAR",
+      "v0.2": 0.735,
+      "semaforo_v0.2": "VERDE"
+    },
+    {
+      "codigo": "IE-06",
+      "grupo": "Eficiencia",
+      "nombre": "Concentración del costo (hotspot)",
+      "caracteristica": "Eficiencia: comportamiento temporal",
+      "medida_5055": "Diagnóstico",
+      "cwe": "Orienta la corrección de CWE de eficiencia",
+      "pregunta": "¿Qué parte del tiempo consume la función más costosa?",
+      "medidas_base": "Tiempo propio por función (cProfile) con N = 20 000",
+      "formula": "IE-06 = (tiempo propio de la función más costosa / tiempo total) × 100",
+      "unidad": "%",
+      "escala": "Razón (0 a 100)",
+      "herramienta": "cProfile",
+      "momento": "Análisis de hallazgos (6.4.4)",
+      "sentido": "menor es mejor",
+      "verde": 30.0,
+      "ambar": 50.0,
+      "interpretacion": "Sobre 50 % un solo punto domina el costo y es la primera corrección a priorizar.",
+      "responsable": "Líder técnico",
+      "v0.1": 51.6,
+      "semaforo_v0.1": "ROJO",
+      "v0.2": 21.0,
+      "semaforo_v0.2": "VERDE"
+    },
+    {
+      "codigo": "IR-01",
+      "grupo": "Proceso de revisión",
+      "nombre": "Tasa de resolución de hallazgos",
+      "caracteristica": "Proceso de revisión ISO/IEC 20246",
+      "medida_5055": "Sobre hallazgos ASCMM/ASCPEM/ASCRM/ASCSM",
+      "cwe": "Todos los CWE registrados en el Issue Log",
+      "pregunta": "¿Qué proporción de los hallazgos de la revisión fue corregida?",
+      "medidas_base": "Hallazgos de la versión revisada; hallazgos que siguen en la nueva versión",
+      "formula": "IR-01 = (hallazgos resueltos / hallazgos identificados) × 100",
+      "unidad": "%",
+      "escala": "Razón (0 a 100)",
+      "herramienta": "Issue Log generado por la herramienta",
+      "momento": "Corrección y reporte (6.4.5)",
+      "sentido": "mayor es mejor",
+      "verde": 90.0,
+      "ambar": 70.0,
+      "interpretacion": "Es el criterio de salida: con 90 % o más el producto se acepta.",
+      "responsable": "Líder de revisión",
+      "v0.1": null,
+      "semaforo_v0.1": "SIN DATO",
+      "v0.2": 100.0,
+      "semaforo_v0.2": "VERDE"
+    }
+  ],
+  "resolucion": {
+    "resueltos": 44,
+    "identificados": 44
+  },
+  "cobertura_5055": {
+    "ASCMM": {
+      "medida": "Mantenibilidad",
+      "total_cwe": 29,
+      "cubiertos": 10
+    },
+    "ASCPEM": {
+      "medida": "Eficiencia de desempeno",
+      "total_cwe": 18,
+      "cubiertos": 8
+    },
+    "ASCRM": {
+      "medida": "Fiabilidad",
+      "total_cwe": 74,
+      "cubiertos": 7
+    },
+    "ASCSM": {
+      "medida": "Seguridad",
+      "total_cwe": 73,
+      "cubiertos": 12
+    }
+  },
+  "hallazgos_por_cwe_v0.1": [
+    {
+      "cwe": 772,
+      "debilidad": "Recurso no liberado tras su vida util",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "ocurrencias": 6
+    },
+    {
+      "cwe": 1072,
+      "debilidad": "Acceso a datos sin reutilizacion de conexiones (pool)",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "ocurrencias": 5
+    },
+    {
+      "cwe": 89,
+      "debilidad": "Inyeccion SQL",
+      "medidas": [
+        "ASCSM"
+      ],
+      "ocurrencias": 4
+    },
+    {
+      "cwe": 1046,
+      "debilidad": "Texto inmutable creado por concatenacion",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "ocurrencias": 4
+    },
+    {
+      "cwe": 390,
+      "debilidad": "Condicion de error detectada sin accion",
+      "medidas": [
+        "ASCRM"
+      ],
+      "ocurrencias": 4
+    },
+    {
+      "cwe": 703,
+      "debilidad": "Manejo incorrecto de condiciones excepcionales",
+      "medidas": [
+        "ASCRM"
+      ],
+      "ocurrencias": 4
+    },
+    {
+      "cwe": 775,
+      "debilidad": "Descriptor de archivo no liberado",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "ocurrencias": 2
+    },
+    {
+      "cwe": 1067,
+      "debilidad": "Busquedas secuenciales excesivas",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "ocurrencias": 2
+    },
+    {
+      "cwe": 369,
+      "debilidad": "Division por cero",
+      "medidas": [
+        "ASCRM",
+        "ASCSM"
+      ],
+      "ocurrencias": 2
+    },
+    {
+      "cwe": 1060,
+      "debilidad": "CWE-1060",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "ocurrencias": 1
+    },
+    {
+      "cwe": 1088,
+      "debilidad": "Acceso sincrono a recurso remoto sin tiempo limite",
+      "medidas": [
+        "ASCRM"
+      ],
+      "ocurrencias": 1
+    },
+    {
+      "cwe": 1051,
+      "debilidad": "Configuracion de red codificada en el fuente",
+      "medidas": [
+        "ASCMM",
+        "ASCRM"
+      ],
+      "ocurrencias": 1
+    },
+    {
+      "cwe": 798,
+      "debilidad": "Credenciales codificadas en el fuente",
+      "medidas": [
+        "ASCSM"
+      ],
+      "ocurrencias": 1
+    },
+    {
+      "cwe": 1041,
+      "debilidad": "Codigo redundante (copiar y pegar)",
+      "medidas": [
+        "ASCMM"
+      ],
+      "ocurrencias": 1
+    },
+    {
+      "cwe": 1057,
+      "debilidad": "Acceso a datos fuera del componente gestor de datos",
+      "medidas": [
+        "ASCPEM",
+        "ASCSM"
+      ],
+      "ocurrencias": 1
+    },
+    {
+      "cwe": 1085,
+      "debilidad": "Volumen excesivo de codigo comentado",
+      "medidas": [
+        "ASCMM"
+      ],
+      "ocurrencias": 1
+    },
+    {
+      "cwe": 561,
+      "debilidad": "Codigo muerto",
+      "medidas": [
+        "ASCMM"
+      ],
+      "ocurrencias": 1
+    },
+    {
+      "cwe": 1050,
+      "debilidad": "Consumo excesivo de recursos de plataforma dentro de un bucle",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "ocurrencias": 1
+    },
+    {
+      "cwe": 1064,
+      "debilidad": "Firma con numero excesivo de parametros",
+      "medidas": [
+        "ASCMM"
+      ],
+      "ocurrencias": 1
+    },
+    {
+      "cwe": 1121,
+      "debilidad": "Complejidad ciclomatica de McCabe excesiva",
+      "medidas": [
+        "ASCMM"
+      ],
+      "ocurrencias": 1
+    }
+  ],
+  "issue_log_v0.1": [
+    {
+      "modulo": "vigisalud.alertas",
+      "linea": 31,
+      "cwe": 1060,
+      "debilidad": "CWE-1060",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "query-in-loop",
+      "mensaje": "Consulta repositorio.contar_casos_por_anio dentro de un bucle"
+    },
+    {
+      "modulo": "vigisalud.alertas",
+      "linea": 61,
+      "cwe": 772,
+      "debilidad": "Recurso no liberado tras su vida util",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'servidor' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.alertas",
+      "linea": 61,
+      "cwe": 1088,
+      "debilidad": "Acceso sincrono a recurso remoto sin tiempo limite",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "remote-no-timeout",
+      "mensaje": "Conexion remota sin tiempo limite"
+    },
+    {
+      "modulo": "vigisalud.config",
+      "linea": 5,
+      "cwe": 1051,
+      "debilidad": "Configuracion de red codificada en el fuente",
+      "medidas": [
+        "ASCMM",
+        "ASCRM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "hardcoded-network",
+      "mensaje": "Direccion de red fija 'smtp.vigisalud-areq.org'"
+    },
+    {
+      "modulo": "vigisalud.config",
+      "linea": 8,
+      "cwe": 798,
+      "debilidad": "Credenciales codificadas en el fuente",
+      "medidas": [
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "hardcoded-credential",
+      "mensaje": "Credencial escrita en el codigo fuente"
+    },
+    {
+      "modulo": "vigisalud.datos",
+      "linea": 22,
+      "cwe": 775,
+      "debilidad": "Descriptor de archivo no liberado",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'archivo' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.datos",
+      "linea": 32,
+      "cwe": 1067,
+      "debilidad": "Busquedas secuenciales excesivas",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "linear-search",
+      "mensaje": "Busqueda lineal por igualdad sobre una coleccion"
+    },
+    {
+      "modulo": "vigisalud.indicadores",
+      "linea": 21,
+      "cwe": 369,
+      "debilidad": "Division por cero",
+      "medidas": [
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "unchecked-division",
+      "mensaje": "Division entre 'poblaciones[clave]' sin control de cero"
+    },
+    {
+      "modulo": "vigisalud.indicadores",
+      "linea": 39,
+      "cwe": 369,
+      "debilidad": "Division por cero",
+      "medidas": [
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "unchecked-division",
+      "mensaje": "Division entre 'casos[enfermedad]' sin control de cero"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 8,
+      "cwe": 1041,
+      "debilidad": "Codigo redundante (copiar y pegar)",
+      "medidas": [
+        "ASCMM"
+      ],
+      "herramienta": "Pylint",
+      "regla": "R0801 duplicate-code",
+      "mensaje": "Similar lines in 2 files"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 21,
+      "cwe": 772,
+      "debilidad": "Recurso no liberado tras su vida util",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'conexion' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 21,
+      "cwe": 1072,
+      "debilidad": "Acceso a datos sin reutilizacion de conexiones (pool)",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "no-connection-reuse",
+      "mensaje": "Conexion nueva por operacion (5 puntos de conexion en el codigo)"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 22,
+      "cwe": 1057,
+      "debilidad": "Acceso a datos fuera del componente gestor de datos",
+      "medidas": [
+        "ASCPEM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "data-access-outside-dal",
+      "mensaje": "SQL ejecutado fuera de repositorio"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 23,
+      "cwe": 89,
+      "debilidad": "Inyeccion SQL",
+      "medidas": [
+        "ASCSM"
+      ],
+      "herramienta": "Bandit",
+      "regla": "B608 hardcoded_sql_expressions",
+      "mensaje": "Possible SQL injection vector through string-based query construction."
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 33,
+      "cwe": 1046,
+      "debilidad": "Texto inmutable creado por concatenacion",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "str-concat-loop",
+      "mensaje": "Texto concatenado con += dentro de un bucle"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 36,
+      "cwe": 1046,
+      "debilidad": "Texto inmutable creado por concatenacion",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "str-concat-loop",
+      "mensaje": "Texto concatenado con += dentro de un bucle"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 41,
+      "cwe": 1046,
+      "debilidad": "Texto inmutable creado por concatenacion",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "str-concat-loop",
+      "mensaje": "Texto concatenado con += dentro de un bucle"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 46,
+      "cwe": 1046,
+      "debilidad": "Texto inmutable creado por concatenacion",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "str-concat-loop",
+      "mensaje": "Texto concatenado con += dentro de un bucle"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 49,
+      "cwe": 1085,
+      "debilidad": "Volumen excesivo de codigo comentado",
+      "medidas": [
+        "ASCMM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "commented-out-code",
+      "mensaje": "3 lineas de codigo comentado"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 52,
+      "cwe": 775,
+      "debilidad": "Descriptor de archivo no liberado",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'archivo' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.reportes",
+      "linea": 55,
+      "cwe": 561,
+      "debilidad": "Codigo muerto",
+      "medidas": [
+        "ASCMM"
+      ],
+      "herramienta": "Pylint",
+      "regla": "W0101 unreachable",
+      "mensaje": "Unreachable code"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 8,
+      "cwe": 772,
+      "debilidad": "Recurso no liberado tras su vida util",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'conexion' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 8,
+      "cwe": 1072,
+      "debilidad": "Acceso a datos sin reutilizacion de conexiones (pool)",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "no-connection-reuse",
+      "mensaje": "Conexion nueva por operacion (5 puntos de conexion en el codigo)"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 20,
+      "cwe": 772,
+      "debilidad": "Recurso no liberado tras su vida util",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'conexion' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 20,
+      "cwe": 1072,
+      "debilidad": "Acceso a datos sin reutilizacion de conexiones (pool)",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "no-connection-reuse",
+      "mensaje": "Conexion nueva por operacion (5 puntos de conexion en el codigo)"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 22,
+      "cwe": 1050,
+      "debilidad": "Consumo excesivo de recursos de plataforma dentro de un bucle",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-in-loop",
+      "mensaje": "Llamada 'execute' dentro de un bucle"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 23,
+      "cwe": 89,
+      "debilidad": "Inyeccion SQL",
+      "medidas": [
+        "ASCSM"
+      ],
+      "herramienta": "Bandit",
+      "regla": "B608 hardcoded_sql_expressions",
+      "mensaje": "Possible SQL injection vector through string-based query construction."
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 32,
+      "cwe": 772,
+      "debilidad": "Recurso no liberado tras su vida util",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'conexion' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 32,
+      "cwe": 1072,
+      "debilidad": "Acceso a datos sin reutilizacion de conexiones (pool)",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "no-connection-reuse",
+      "mensaje": "Conexion nueva por operacion (5 puntos de conexion en el codigo)"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 34,
+      "cwe": 89,
+      "debilidad": "Inyeccion SQL",
+      "medidas": [
+        "ASCSM"
+      ],
+      "herramienta": "Bandit",
+      "regla": "B608 hardcoded_sql_expressions",
+      "mensaje": "Possible SQL injection vector through string-based query construction."
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 45,
+      "cwe": 772,
+      "debilidad": "Recurso no liberado tras su vida util",
+      "medidas": [
+        "ASCPEM",
+        "ASCRM",
+        "ASCSM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "resource-not-released",
+      "mensaje": "'conexion' se abre sin 'with' y no se cierra"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 45,
+      "cwe": 1072,
+      "debilidad": "Acceso a datos sin reutilizacion de conexiones (pool)",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "no-connection-reuse",
+      "mensaje": "Conexion nueva por operacion (5 puntos de conexion en el codigo)"
+    },
+    {
+      "modulo": "vigisalud.repositorio",
+      "linea": 46,
+      "cwe": 89,
+      "debilidad": "Inyeccion SQL",
+      "medidas": [
+        "ASCSM"
+      ],
+      "herramienta": "Bandit",
+      "regla": "B608 hardcoded_sql_expressions",
+      "mensaje": "Possible SQL injection vector through string-based query construction."
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 10,
+      "cwe": 1064,
+      "debilidad": "Firma con numero excesivo de parametros",
+      "medidas": [
+        "ASCMM"
+      ],
+      "herramienta": "Pylint + Pylint",
+      "regla": "R0913 too-many-arguments",
+      "mensaje": "Too many arguments (11/7)"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 17,
+      "cwe": 1121,
+      "debilidad": "Complejidad ciclomatica de McCabe excesiva",
+      "medidas": [
+        "ASCMM"
+      ],
+      "herramienta": "Radon",
+      "regla": "cc>10",
+      "mensaje": "validar_notificacion: CC = 21"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 35,
+      "cwe": 390,
+      "debilidad": "Condicion de error detectada sin accion",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "except-pass",
+      "mensaje": "Excepcion capturada sin ninguna accion"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 35,
+      "cwe": 703,
+      "debilidad": "Manejo incorrecto de condiciones excepcionales",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Pylint + Bandit",
+      "regla": "W0702 bare-except",
+      "mensaje": "No exception type(s) specified"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 42,
+      "cwe": 390,
+      "debilidad": "Condicion de error detectada sin accion",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "except-pass",
+      "mensaje": "Excepcion capturada sin ninguna accion"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 42,
+      "cwe": 703,
+      "debilidad": "Manejo incorrecto de condiciones excepcionales",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Pylint + Bandit",
+      "regla": "W0702 bare-except",
+      "mensaje": "No exception type(s) specified"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 49,
+      "cwe": 390,
+      "debilidad": "Condicion de error detectada sin accion",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "except-pass",
+      "mensaje": "Excepcion capturada sin ninguna accion"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 49,
+      "cwe": 703,
+      "debilidad": "Manejo incorrecto de condiciones excepcionales",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Pylint + Bandit",
+      "regla": "W0702 bare-except",
+      "mensaje": "No exception type(s) specified"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 56,
+      "cwe": 390,
+      "debilidad": "Condicion de error detectada sin accion",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "except-pass",
+      "mensaje": "Excepcion capturada sin ninguna accion"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 56,
+      "cwe": 703,
+      "debilidad": "Manejo incorrecto de condiciones excepcionales",
+      "medidas": [
+        "ASCRM"
+      ],
+      "herramienta": "Pylint + Bandit",
+      "regla": "W0702 bare-except",
+      "mensaje": "No exception type(s) specified"
+    },
+    {
+      "modulo": "vigisalud.validacion",
+      "linea": 80,
+      "cwe": 1067,
+      "debilidad": "Busquedas secuenciales excesivas",
+      "medidas": [
+        "ASCPEM"
+      ],
+      "herramienta": "Detector AST",
+      "regla": "list-membership-loop",
+      "mensaje": "Busqueda 'in' sobre la lista 'ids_vistos' dentro de un bucle"
+    }
+  ],
+  "complejidad_top_v0.1": [
+    {
+      "modulo": "vigisalud.validacion",
+      "funcion": "validar_notificacion",
+      "linea": 17,
+      "cc": 21
+    },
+    {
+      "modulo": "vigisalud.indicadores",
+      "funcion": "distribuir_por_edad",
+      "linea": 43,
+      "cc": 7
+    },
+    {
+      "modulo": "vigisalud.alertas",
+      "funcion": "calcular_canal_endemico",
+      "linea": 25,
+      "cc": 5
+    },
+    {
+      "modulo": "vigisalud.indicadores",
+      "funcion": "calcular_incidencia",
+      "linea": 6,
+      "cc": 5
+    },
+    {
+      "modulo": "vigisalud.indicadores",
+      "funcion": "calcular_letalidad",
+      "linea": 27,
+      "cc": 5
+    }
+  ],
+  "curvas": {
+    "v0.1": [
+      {
+        "n": 2500,
+        "mediana_s": 0.4616,
+        "tiempos_s": [
+          0.468,
+          0.4596,
+          0.4616
+        ]
+      },
+      {
+        "n": 5000,
+        "mediana_s": 0.7507,
+        "tiempos_s": [
+          0.7651,
+          0.7507,
+          0.7498
+        ]
+      },
+      {
+        "n": 10000,
+        "mediana_s": 1.4719,
+        "tiempos_s": [
+          1.4809,
+          1.4198,
+          1.4719
+        ]
+      },
+      {
+        "n": 20000,
+        "mediana_s": 3.9399,
+        "tiempos_s": [
+          3.9399,
+          3.9185,
+          3.9806,
+          4.3021,
+          3.9281
+        ]
+      },
+      {
+        "n": 40000,
+        "mediana_s": 19.9341,
+        "tiempos_s": [
+          17.489,
+          20.1069,
+          19.9341
+        ]
+      }
+    ],
+    "v0.2": [
+      {
+        "n": 2500,
+        "mediana_s": 0.046,
+        "tiempos_s": [
+          0.0513,
+          0.046,
+          0.0432
+        ]
+      },
+      {
+        "n": 5000,
+        "mediana_s": 0.0638,
+        "tiempos_s": [
+          0.0724,
+          0.0635,
+          0.0638
+        ]
+      },
+      {
+        "n": 10000,
+        "mediana_s": 0.1029,
+        "tiempos_s": [
+          0.1085,
+          0.1029,
+          0.101
+        ]
+      },
+      {
+        "n": 20000,
+        "mediana_s": 0.1847,
+        "tiempos_s": [
+          0.1885,
+          0.1847,
+          0.1894,
+          0.1785,
+          0.1826
+        ]
+      },
+      {
+        "n": 40000,
+        "mediana_s": 0.3453,
+        "tiempos_s": [
+          0.3544,
+          0.3448,
+          0.3453
+        ]
+      }
+    ]
+  },
+  "hotspots": {
+    "v0.1": [
+      {
+        "funcion": "~:0(<method 'execute' of 'sqlite3.Connection' objects>)",
+        "tiempo_propio_s": 2.1133,
+        "porcentaje": 51.6
+      },
+      {
+        "funcion": "validacion.py:73(validar_lote)",
+        "tiempo_propio_s": 1.4183,
+        "porcentaje": 34.6
+      },
+      {
+        "funcion": "~:0(<built-in method _sqlite3.connect>)",
+        "tiempo_propio_s": 0.1886,
+        "porcentaje": 4.6
+      }
+    ],
+    "v0.2": [
+      {
+        "funcion": "validacion.py:53(validar_notificacion)",
+        "tiempo_propio_s": 0.054,
+        "porcentaje": 21.0
+      },
+      {
+        "funcion": "~:0(<method 'executemany' of 'sqlite3.Connection' objects>)",
+        "tiempo_propio_s": 0.0473,
+        "porcentaje": 18.4
+      },
+      {
+        "funcion": "csv.py:112(__next__)",
+        "tiempo_propio_s": 0.0271,
+        "porcentaje": 10.5
+      }
+    ]
+  },
+  "bd_bloqueada": {
+    "v0.1": "17/17",
+    "v0.2": "0/17"
+  },
+  "resumen_funcional": {
+    "leidas": 20200,
+    "validas": 19610,
+    "rechazadas": 590,
+    "alertas": 95,
+    "letalidad": {
+      "IRA": 0.67,
+      "DENGUE": 1.21,
+      "EDA": 0.68
+    },
+    "edades": {
+      "NINO (0-11)": 225,
+      "ADOLESCENTE (12-17)": 104,
+      "JOVEN (18-29)": 228,
+      "ADULTO (30-59)": 558,
+      "ADULTO MAYOR (60+)": 647
+    }
+  }
+}

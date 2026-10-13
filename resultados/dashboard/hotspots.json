@@ -1,0 +1,38 @@
+[
+ {
+  "version": "v0.1",
+  "rank": 1,
+  "function": "~:0(<method 'execute' of 'sqlite3.Connection' objects>)",
+  "share_pct": 51.6
+ },
+ {
+  "version": "v0.1",
+  "rank": 2,
+  "function": "validacion.py:73(validar_lote)",
+  "share_pct": 34.6
+ },
+ {
+  "version": "v0.1",
+  "rank": 3,
+  "function": "~:0(<built-in method _sqlite3.connect>)",
+  "share_pct": 4.6
+ },
+ {
+  "version": "v0.2",
+  "rank": 1,
+  "function": "validacion.py:53(validar_notificacion)",
+  "share_pct": 21.0
+ },
+ {
+  "version": "v0.2",
+  "rank": 2,
+  "function": "~:0(<method 'executemany' of 'sqlite3.Connection' objects>)",
+  "share_pct": 18.4
+ },
+ {
+  "version": "v0.2",
+  "rank": 3,
+  "function": "csv.py:112(__next__)",
+  "share_pct": 10.5
+ }
+]

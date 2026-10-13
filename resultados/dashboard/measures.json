@@ -1,0 +1,34 @@
+[
+ {
+  "measure": "ASCMM",
+  "characteristic": "Maintainability",
+  "cwe_in_standard": 29,
+  "cwe_covered": 10,
+  "occurrences_v01": 6,
+  "occurrences_v02": 0
+ },
+ {
+  "measure": "ASCPEM",
+  "characteristic": "Performance efficiency",
+  "cwe_in_standard": 18,
+  "cwe_covered": 8,
+  "occurrences_v01": 22,
+  "occurrences_v02": 0
+ },
+ {
+  "measure": "ASCRM",
+  "characteristic": "Reliability",
+  "cwe_in_standard": 74,
+  "cwe_covered": 7,
+  "occurrences_v01": 20,
+  "occurrences_v02": 0
+ },
+ {
+  "measure": "ASCSM",
+  "characteristic": "Security",
+  "cwe_in_standard": 73,
+  "cwe_covered": 12,
+  "occurrences_v01": 16,
+  "occurrences_v02": 0
+ }
+]
